@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -30,7 +31,16 @@ private final Map<Long, User> users = new HashMap<>();
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.info("Создание нового пользователя: {}", user.getLogin());
-        user = user.toBuilder().id(getNextId()).build();
+        if (Objects.isNull(user.getName())) {
+            user = user.toBuilder()
+                    .id(getNextId())
+                    .name(user.getLogin())
+                    .build();
+        } else {
+            user = user.toBuilder()
+                    .id(getNextId())
+                    .build();
+        }
         users.put(user.getId(), user);
         log.info("Пользователь c id {} успешно добавлен", user.getId());
         return user;
