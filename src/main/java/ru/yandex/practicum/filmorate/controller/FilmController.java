@@ -34,23 +34,27 @@ public class FilmController {
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("Добавление нового фильма: {}", film.getName());
-        film.setId(getNextId());
+        film = film.toBuilder().id(getNextId()).build();
         films.put(film.getId(), film);
+        log.info("Фильм c id {} успешно добавлен", film.getId());
         return film;
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
+        Long id = newFilm.getId();
+        if (films.containsKey(id)) {
+            log.info("Обновление фильма с id: {}", id);
 
-        if (films.containsKey(newFilm.getId())) {
-            Film oldFilm = films.get(newFilm.getId());
-            log.info("Обновление фильма: {}", oldFilm.getName());
+            Film oldFilm = newFilm.toBuilder()
+                    .name(newFilm.getName())
+                    .description(newFilm.getDescription())
+                    .releaseDate(newFilm.getReleaseDate())
+                    .duration(newFilm.getDuration())
+                    .build();
 
-            oldFilm.setName(newFilm.getName());
-            oldFilm.setDescription(newFilm.getDescription());
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            oldFilm.setDuration(newFilm.getDuration());
-
+            films.put(id, oldFilm);
+            log.info("Фильм с id {} успешно обновлён", id);
             return oldFilm;
         } else {
             log.error("Фильм с id = " + newFilm.getId() + " не найден");

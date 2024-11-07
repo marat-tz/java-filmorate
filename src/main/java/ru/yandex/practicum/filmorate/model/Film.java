@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.validator.ReleaseDateCheck;
@@ -18,8 +20,8 @@ import java.time.LocalDate;
 /**
  * Film.
  */
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Value
+@Builder(toBuilder = true)
 public class Film {
     @NotNull(message = "Id должен быть указан")
     Long id;
