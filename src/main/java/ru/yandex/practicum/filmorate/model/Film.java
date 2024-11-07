@@ -23,7 +23,7 @@ import java.time.LocalDate;
 @Value
 @Builder(toBuilder = true)
 public class Film {
-    @NotNull(message = "Id должен быть указан")
+
     Long id;
 
     @NotNull(message = "Название не может быть пустым")
