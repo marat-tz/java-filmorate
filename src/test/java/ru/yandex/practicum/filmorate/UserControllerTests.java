@@ -64,6 +64,21 @@ public class UserControllerTests {
     }
 
     @Test
+    void create_shouldNotCreateWrongEmail() throws IOException, InterruptedException {
+        User newUser = user.toBuilder().email("ololo").build();
+        String userJson = gson.toJson(newUser);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(userJson))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(400, response.statusCode());
+    }
+
+    @Test
     void create_shouldCreateUser() throws IOException, InterruptedException {
         User actualUser = user.toBuilder().id(1L).build();
         String userJson = gson.toJson(user);
