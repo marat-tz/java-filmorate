@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -64,7 +64,7 @@ private final Map<Long, User> users = new HashMap<>();
             return oldUser;
         } else {
             log.error("Пользователь с id = " + id + " не найден");
-            throw new UserNotFoundException("Пользователь с id = " + id + " не найден");
+            throw new ValidationException("Пользователь с id = " + id + " не найден");
         }
     }
 
