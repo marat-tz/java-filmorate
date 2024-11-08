@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
@@ -26,8 +28,7 @@ public class Film {
 
     Long id;
 
-    @NotNull(message = "Название не может быть пустым")
-    @NotBlank(message = "Название не может состоять из пробелов")
+    @NotBlank(message = "Название не может быть пустым")
     String name;
 
     @Size(max = 200, message = "Максимальная длина описания — 200 символов")
