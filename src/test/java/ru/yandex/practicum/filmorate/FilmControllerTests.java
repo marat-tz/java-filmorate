@@ -25,14 +25,14 @@ public class FilmControllerTests {
 
     ConfigurableApplicationContext ctx;
     private HttpClient client;
-    private Film film = Film.builder()
+    private final Film film = Film.builder()
             .name("Name")
             .description("Description")
             .releaseDate(LocalDate.of(2001, 9, 11))
             .duration(90)
             .build();
 
-    private Gson gson = new GsonBuilder()
+    private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
             .create();
 
