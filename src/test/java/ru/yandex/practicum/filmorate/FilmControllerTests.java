@@ -25,6 +25,7 @@ public class FilmControllerTests {
 
     ConfigurableApplicationContext ctx;
     private HttpClient client;
+    private final URI url = URI.create("http://localhost:8080/films");
     private final Film film = Film.builder()
             .name("Name")
             .description("Description")
@@ -52,7 +53,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().name("").build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -68,7 +68,6 @@ public class FilmControllerTests {
         Film actualFilm = film.toBuilder().id(1L).build();
         String filmJson = gson.toJson(film);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -85,7 +84,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().description(".".repeat(201)).build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -101,7 +99,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().description(".".repeat(200)).build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -117,7 +114,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().releaseDate(null).build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -133,7 +129,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().releaseDate(LocalDate.of(1895, 12, 27)).build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -149,7 +144,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().duration(-1).build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
@@ -165,7 +159,6 @@ public class FilmControllerTests {
         Film newFilm = film.toBuilder().duration(null).build();
         String filmJson = gson.toJson(newFilm);
 
-        URI url = URI.create("http://localhost:8080/films");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .header("Content-Type", "application/json")
