@@ -2,7 +2,10 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
@@ -47,15 +50,18 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User newUser) {
         Long id = newUser.getId();
+
         if (users.containsKey(id)) {
             log.info("Обновление данных пользователя с id = {}", id);
             User user = mapper.toUser(newUser);
             users.put(id, user);
+
             log.info("Пользователь с id = {} успешно обновлён", id);
             return user;
+
         } else {
             log.error("Пользователь с id = {} не найден", id);
-            throw new ValidationException("Пользователь с id = " + id + " не найден");
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
     }
 
