@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -17,24 +17,25 @@ import java.util.Optional;
 @Service
 public class FilmService {
 
-    @Autowired
-    FilmStorage filmStorage;
+    private FilmStorage filmStorage;
+    private UserService userService;
 
     @Autowired
-    UserStorage userStorage;
-
-    private Optional<Film> findFilm(long id) {
-        return filmStorage.findAll()
-                .stream()
-                .filter(film -> film.getId() == id)
-                .findFirst();
+    public FilmService(FilmStorage filmStorage, UserService userService) {
+        this.filmStorage = filmStorage;
+        this.userService = userService;
     }
 
-    private Optional<User> findUser(long id) {
-        return userStorage.findAll()
-                .stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    public Collection<Film> findAll() {
+        return filmStorage.findAll();
     }
 
     public Film addLike(long filmId, long userId) {
@@ -85,10 +86,24 @@ public class FilmService {
             throw new RuntimeException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
         }
 
-        return filmStorage.findAll()
+        return findAll()
                 .stream()
                 .sorted(filmComparator.reversed())
                 .limit(count)
                 .toList();
+    }
+
+    private Optional<Film> findFilm(long id) {
+        return findAll()
+                .stream()
+                .filter(film -> film.getId() == id)
+                .findFirst();
+    }
+
+    private Optional<User> findUser(long id) {
+        return userService.findAll()
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst();
     }
 }

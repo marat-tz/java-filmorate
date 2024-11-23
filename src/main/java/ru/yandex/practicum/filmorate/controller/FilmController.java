@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,28 +21,26 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final FilmStorage storage;
     private final FilmService service;
 
     @Autowired
-    public FilmController(FilmStorage storage, FilmService service) {
-        this.storage = storage;
+    public FilmController(FilmService service) {
         this.service = service;
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        return storage.findAll();
+        return service.findAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        return storage.create(film);
+        return service.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        return storage.update(newFilm);
+        return service.update(newFilm);
     }
 
     @PutMapping("/{id}/like/{userId}")
