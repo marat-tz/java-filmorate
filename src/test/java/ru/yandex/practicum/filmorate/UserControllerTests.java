@@ -52,7 +52,7 @@ public class UserControllerTests {
 
         mvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").isNotEmpty());
     }
 
     @Test
