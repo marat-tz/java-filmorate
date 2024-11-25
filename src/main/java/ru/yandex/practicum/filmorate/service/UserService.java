@@ -21,6 +21,8 @@ public interface UserService {
 
     Collection<User> findAll();
 
+    Optional<User> findById(long id);
+
     User addFriend(long mainUserId, long friendUserId);
 
     User removeFriend(long mainUserId, long friendUserId);

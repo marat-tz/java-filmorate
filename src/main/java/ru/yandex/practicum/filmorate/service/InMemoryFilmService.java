@@ -100,16 +100,11 @@ public class InMemoryFilmService implements FilmService {
 
 
     private Optional<Film> findFilm(long id) {
-        return findAll()
-                .stream()
-                .filter(film -> film.getId() == id)
-                .findFirst();
+        return filmStorage.findById(id);
     }
 
     private Optional<User> findUser(long id) {
-        return userService.findAll()
-                .stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+        return userService.findById(id);
     }
+
 }

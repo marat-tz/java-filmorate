@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -25,6 +26,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Collection<Film> findAll() {
         return films.values();
+    }
+
+    @Override
+    public Optional<Film> findById(long id) {
+        if (films.containsKey(id)) {
+            return Optional.of(films.get(id));
+        }
+        return Optional.empty();
     }
 
     @Override

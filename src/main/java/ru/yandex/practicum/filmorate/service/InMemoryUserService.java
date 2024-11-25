@@ -24,10 +24,7 @@ public class InMemoryUserService implements UserService {
     }
 
     private Optional<User> findUser(long userId) {
-        return storage.findAll()
-                .stream()
-                .filter(user -> user.getId() == userId)
-                .findFirst();
+        return storage.findById(userId);
     }
 
     @Override
@@ -92,6 +89,11 @@ public class InMemoryUserService implements UserService {
     @Override
     public Collection<User> findAll() {
         return storage.findAll();
+    }
+
+    @Override
+    public Optional<User> findById(long id) {
+        return storage.findById(id);
     }
 
     @Override
