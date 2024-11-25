@@ -18,7 +18,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
     private final FilmMapper mapper;
 
-    @Autowired
     public InMemoryFilmStorage(FilmMapper mapper) {
         this.mapper = mapper;
     }

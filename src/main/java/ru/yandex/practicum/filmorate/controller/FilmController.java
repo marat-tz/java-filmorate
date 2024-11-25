@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,10 +21,9 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final FilmService service;
+    private final InMemoryFilmService service;
 
-    @Autowired
-    public FilmController(FilmService service) {
+    public FilmController(InMemoryFilmService service) {
         this.service = service;
     }
 
