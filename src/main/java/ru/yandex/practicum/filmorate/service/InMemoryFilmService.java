@@ -17,8 +17,8 @@ import java.util.Optional;
 @Service
 public class InMemoryFilmService implements FilmService {
 
-    private FilmStorage filmStorage;
-    private InMemoryUserService userService;
+    private final FilmStorage filmStorage;
+    private final InMemoryUserService userService;
 
     public InMemoryFilmService(FilmStorage filmStorage, InMemoryUserService userService) {
         this.filmStorage = filmStorage;
