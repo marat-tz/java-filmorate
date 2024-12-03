@@ -8,12 +8,15 @@ import lombok.Value;
 import ru.yandex.practicum.filmorate.validator.NotSpaces;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Value
 @Builder(toBuilder = true)
 public class User {
 
     Long id;
+    Set<Long> friendsId = new HashSet<>();
 
     @NotBlank(message = "Электронная почта не может быть пустой")
     @Email(message = "Электронная почта должна соответствовать шаблону name@domain.xx")

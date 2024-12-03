@@ -2,140 +2,255 @@ package ru.yandex.practicum.filmorate;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.SpringApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.adapters.LocalDateAdapter;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTests {
 
-    ConfigurableApplicationContext ctx;
-    private HttpClient client;
-    private final URI url = URI.create("http://localhost:8080/users");
-    private final User user = User.builder()
-            .email("email@test.ru")
-            .login("Login")
-            .name("Name")
-            .birthday(LocalDate.of(2001, 9, 11))
-            .build();
+    @Autowired
+    MockMvc mvc;
 
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
             .create();
 
-    @BeforeEach
-    public void start() {
-        client = HttpClient.newHttpClient();
-        ctx = SpringApplication.run(FilmorateApplication.class);
-    }
-
-    @AfterEach
-    public void stop() {
-        ctx.close();
-    }
-
-    @Test
-    void create_shouldNotCreateEmptyEmail() throws IOException, InterruptedException {
-        User newUser = user.toBuilder().email("").build();
-        String userJson = gson.toJson(newUser);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(400, response.statusCode());
+    private String createUser(Long id, String email, String login, String name, LocalDate birth) {
+        User user = User.builder()
+                    .id(id)
+                    .email(email)
+                    .login(login)
+                    .name(name)
+                    .birthday(birth)
+                    .build();
+        return gson.toJson(user);
     }
 
     @Test
-    void create_shouldNotCreateWrongEmail() throws IOException, InterruptedException {
-        User newUser = user.toBuilder().email("ololo").build();
-        String userJson = gson.toJson(newUser);
+    void findAll_shouldFindAllUsers() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "email@test.ru", "Login", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(400, response.statusCode());
+        mvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").isNotEmpty());
     }
 
     @Test
-    void create_shouldCreateUser() throws IOException, InterruptedException {
-        User actualUser = user.toBuilder().id(1L).build();
-        String userJson = gson.toJson(user);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
-        assertEquals(actualUser, gson.fromJson(response.body(), User.class));
+    void create_shouldNotCreateEmptyEmail() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "", "Login", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void create_shouldNotCreateEmptyLogin() throws IOException, InterruptedException {
-        User actualUser = user.toBuilder().login("").build();
-        String userJson = gson.toJson(actualUser);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(400, response.statusCode());
+    void create_shouldNotCreateWrongEmail() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "ololo", "Login", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void create_shouldCreateEmptyName() throws IOException, InterruptedException {
-        User actualUser = user.toBuilder().name("").build();
-        String userJson = gson.toJson(actualUser);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
+    void create_shouldNotCreateEmptyLogin() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "ololo", "", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void create_shouldNotCreateBirthAfterNow() throws IOException, InterruptedException {
-        User actualUser = user.toBuilder().birthday(LocalDate.now().plusDays(1)).build();
-        String userJson = gson.toJson(actualUser);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(400, response.statusCode());
+    void create_shouldCreateEmptyName() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
     }
+
+    @Test
+    void create_shouldNotCreateBirthAfterNow() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.now().plusDays(1))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void create_shouldReturnValidUser() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.email").value("test@test.ru"))
+                .andExpect(jsonPath("$.login").value("Test"))
+                .andExpect(jsonPath("$.name").value("Name"))
+                .andExpect(jsonPath("$.birthday").value("2001-09-11"));
+    }
+
+    @Test
+    void update_shouldUpdateUser() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(1L,"test@test1.ru", "Test1", "Name1",
+                                LocalDate.of(2002, 9, 11))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("test@test1.ru"))
+                .andExpect(jsonPath("$.login").value("Test1"))
+                .andExpect(jsonPath("$.name").value("Name1"))
+                .andExpect(jsonPath("$.birthday").value("2002-09-11"));
+    }
+
+    @Test
+    void addFriend_shouldAddFriend() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/users/1/friends/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendsId").isNotEmpty());
+    }
+
+    @Test
+    void addFriend_shouldNotAddMyself() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/users/1/friends/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void removeFriend_shouldRemoveFriend() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/users/1/friends/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendsId").isNotEmpty());
+
+        mvc.perform(delete("/users/1/friends/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendsId").isEmpty());
+    }
+
+    @Test
+    void getFriends_shouldGetFriends() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/users/1/friends/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendsId").isNotEmpty());
+
+        mvc.perform(get("/users/1/friends")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+    @Test
+    void getCommonFriends_shouldGetCommonFriends() throws Exception {
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUser(null, "test@test.ru", "Test", "Name",
+                                LocalDate.of(2001, 9, 11))))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/users/1/friends/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendsId").isNotEmpty());
+
+        mvc.perform(put("/users/1/friends/3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.friendsId").isNotEmpty());
+
+        mvc.perform(get("/users/2/friends/common/3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+
 }
