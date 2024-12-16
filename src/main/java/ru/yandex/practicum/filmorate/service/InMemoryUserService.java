@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -16,9 +18,10 @@ import java.util.Set;
 @Service
 public class InMemoryUserService implements UserService {
 
+    @Qualifier("userDbStorage")
     private final UserStorage storage;
 
-    public InMemoryUserService(UserStorage storage) {
+    public InMemoryUserService(@Qualifier("userDbStorage") UserStorage storage) {
         this.storage = storage;
     }
 
@@ -81,7 +84,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public User update(User user) {
+    public ResponseEntity<User> update(User user) {
         return storage.update(user);
     }
 

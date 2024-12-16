@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +30,18 @@ public class UserController {
         return service.findAll();
     }
 
+    @GetMapping("/{id}")
+    public User findById(@PathVariable Long id) {
+        return service.findById(id).isPresent() ? service.findById(id).get() : null;
+    }
+
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         return service.create(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
+    public ResponseEntity<User> update(@Valid @RequestBody User newUser) {
         return service.update(newUser);
     }
 
