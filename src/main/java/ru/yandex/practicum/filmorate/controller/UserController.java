@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> update(@Valid @RequestBody User newUser) {
+    public User update(@Valid @RequestBody User newUser) {
         return service.update(newUser);
     }
 

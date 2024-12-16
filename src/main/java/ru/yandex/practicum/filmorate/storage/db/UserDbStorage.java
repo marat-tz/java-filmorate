@@ -64,21 +64,6 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public User findByLogin(String login) {
-        String sqlQuery = "SELECT id, email, login, name, birthday " +
-                "from users where login = ?";
-
-        Optional<List<User>> resultUser = Optional.of(jdbcTemplate.query(sqlQuery,
-                this::mapRowToUser, login));
-
-        if (resultUser.get().size() > 0) {
-            return resultUser.get().get(0);
-
-        } else {
-            throw new NotFoundException("Пользователь с login = " + login + " не найден");
-        }
-    }
-
     @Override
     public User create(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,7 +72,7 @@ public class UserDbStorage implements UserStorage {
 
         log.info("Создание нового пользователя: {}", user.getLogin());
 
-        String sqlQuery = "INSERT INTO USERS(email, login, name, birthday) " +
+        String sqlQuery = "INSERT INTO users(email, login, name, birthday) " +
                 "values (?, ?, ?, ?)";
 
         if (Objects.isNull(user.getName())) {
@@ -95,12 +80,6 @@ public class UserDbStorage implements UserStorage {
         } else {
             finalUser = mapper.toUser(user);
         }
-
-//        jdbcTemplate.update(sqlQuery,
-//                user.getEmail(),
-//                user.getLogin(),
-//                user.getName(),
-//                user.getBirthday());
 
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
@@ -128,7 +107,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public ResponseEntity<User> update(User newUser) {
+    public User update(User newUser) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         final long userId;
 
@@ -169,11 +148,11 @@ public class UserDbStorage implements UserStorage {
 
         if (rows > 0) {
             log.info("Пользователь с id = {} успешно обновлён", userId);
-            return new ResponseEntity<>(resultUser, headers, HttpStatus.OK);
+            return resultUser;
 
         } else {
-            log.info("Пользователь с id = {} не найден", userId);
-            return new ResponseEntity<>(resultUser, headers, HttpStatus.NOT_FOUND);
+            log.error("Пользователь с id = {} не найден", userId);
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
     }
 

@@ -84,7 +84,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public ResponseEntity<User> update(User user) {
+    public User update(User user) {
         return storage.update(user);
     }
 

@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public ResponseEntity<User> update(User newUser) {
+    public User update(User newUser) {
         Long id = newUser.getId();
 
         HttpHeaders headers = new HttpHeaders();
@@ -67,7 +67,7 @@ public class InMemoryUserStorage implements UserStorage {
             users.put(id, user);
 
             log.info("Пользователь с id = {} успешно обновлён", id);
-            return new ResponseEntity<>(user, headers, HttpStatus.OK);
+            return user;
 
         } else {
             log.error("Пользователь с id = {} не найден", id);

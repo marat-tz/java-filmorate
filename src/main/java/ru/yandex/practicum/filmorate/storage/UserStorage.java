@@ -14,5 +14,5 @@ public interface UserStorage {
 
     User create(User user);
 
-    ResponseEntity<User> update(User newUser);
+    User update(User newUser);
 }

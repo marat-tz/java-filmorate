@@ -14,7 +14,7 @@ public interface UserService {
 
     User create(User user);
 
-    ResponseEntity<User> update(User user);
+    User update(User user);
 
     Collection<User> findAll();
 
