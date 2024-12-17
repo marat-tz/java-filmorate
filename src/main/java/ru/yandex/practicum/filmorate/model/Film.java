@@ -35,9 +35,7 @@ public class Film {
     @PositiveOrZero(message = "Продолжительность фильма должна быть положительным числом")
     Integer duration;
 
-    @NotNull
     Mpa mpa;
 
-    @NotNull
     Genre genre;
 }
