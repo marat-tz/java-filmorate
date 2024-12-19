@@ -11,8 +11,8 @@ public interface MpaStorage {
 
     Collection<Mpa> findAll();
 
-    Optional<Mpa> findById(long id);
+    Optional<Mpa> findById(Long id);
 
-    String getNameById(long id);
+    Mpa getNameById(Long id);
 
 }
