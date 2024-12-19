@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.service.InMemoryUserService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -107,6 +109,22 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Фильм с id = {} не найден", filmId);
             throw new NotFoundException("Фильм с id = " + filmId + " не найден");
         }
+    }
+
+    @Override
+    public List<Film> getPopularFilms(Long count) {
+        Comparator<Film> filmComparator = Comparator.comparingInt(film -> film.getLikes().size());
+
+        if (count <= 0) {
+            log.error("Число отображаемых фильмов count не может быть меньше, либо равно 0");
+            throw new RuntimeException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
+        }
+
+        return findAll()
+                .stream()
+                .sorted(filmComparator.reversed())
+                .limit(count)
+                .toList();
     }
 
     private Optional<Film> findFilm(long id) {

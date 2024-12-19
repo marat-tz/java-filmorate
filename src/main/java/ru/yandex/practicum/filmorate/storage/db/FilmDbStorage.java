@@ -20,7 +20,11 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -86,30 +90,12 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException("Ошибка добавления фильма в таблицу");
         }
 
-//        String sqlQueryGenreIds = "SELECT id from genres";
-//        List<Long> genresIdList = jdbcTemplate.queryForList(sqlQueryGenreIds, Long.class);
-//
-//        if (Objects.nonNull(film.getGenres())) {
-//            for (Genre genre : film.getGenres()) {
-//                // если айдишка существует, то делаем запись в соединительную таблицу
-//                if (genresIdList.contains(genre.getId())) {
-//                    String sqlQueryGenre = "INSERT INTO film_genres(film_id, genre_id) " + "values (?, ?)";
-//                    jdbcTemplate.update(connection -> {
-//                        PreparedStatement stmt = connection.prepareStatement(sqlQueryGenre);
-//                        stmt.setLong(1, filmId);
-//                        stmt.setLong(2, genre.getId());
-//                        return stmt;
-//                    });
-//                }
-//            }
-//        }
-
-        // TODO: использовать COUNT
         String sqlQueryGenreIds = "SELECT id from genres where id = ?";
         List<Long> existIdGenres = new ArrayList<>();
         Long genreId;
 
         if (Objects.nonNull(film.getGenres())) {
+            // TODO: вместо цикла с запросом, нужно один раз получить все данные из таблицы с жанрами и пройтись по ней
             for (Genre genre : film.getGenres()) {
                 try {
                     genreId = jdbcTemplate.queryForObject(sqlQueryGenreIds, Long.class, genre.getId());
@@ -253,6 +239,35 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public List<Film> getPopularFilms(Long count) {
+        log.info("Получение популярных фильмов в количестве {}", count);
+
+        if (count <= 0) {
+            log.error("Число отображаемых фильмов count не может быть меньше, либо равно 0");
+            throw new ValidationException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
+        }
+
+        String filmLikesQuery = "SELECT film_id, " +
+                "COUNT(film_id) AS likes " +
+                "FROM film_like " +
+                "GROUP BY film_id " +
+                "ORDER BY likes DESC ";
+
+        List<Long> filmIds = jdbcTemplate.queryForObject(filmLikesQuery, this::mapRowToLikes);
+        List<Film> result = new ArrayList<>();
+
+        // TODO: заполнить список через стрим с количеством count записей
+        // вместо findById использовать findAll
+        for (Long id : filmIds) {
+            if (findById(id).isPresent()) {
+                result.add(findById(id).get());
+            }
+        }
+
+        return result;
+    }
+
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getLong("id"))
@@ -262,4 +277,17 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(resultSet.getInt("duration"))
                 .build();
     }
+
+    private List<Long> mapRowToLikes(ResultSet resultSet, int rowNum) throws SQLException {
+        List<Long> filmIds = new ArrayList<>();
+
+        while (resultSet.next()) {
+            Long filmId = resultSet.getLong("film_id");
+
+            filmIds.add(filmId);
+        }
+
+        return filmIds;
+    }
+
 }

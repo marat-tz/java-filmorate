@@ -50,18 +50,7 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public List<Film> getPopularFilms(Long count) {
-        Comparator<Film> filmComparator = Comparator.comparingInt(film -> film.getLikes().size());
-
-        if (count <= 0) {
-            log.error("Число отображаемых фильмов count не может быть меньше, либо равно 0");
-            throw new RuntimeException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
-        }
-
-        return findAll()
-                .stream()
-                .sorted(filmComparator.reversed())
-                .limit(count)
-                .toList();
+        return filmStorage.getPopularFilms(count);
     }
 
 }
