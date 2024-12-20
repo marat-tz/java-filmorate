@@ -49,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findById(long id) {
+    public Optional<Film> findById(Long id) {
         String sqlQuery = "SELECT id, name, description, releaseDate, duration " +
                 "from films where id = ?";
 

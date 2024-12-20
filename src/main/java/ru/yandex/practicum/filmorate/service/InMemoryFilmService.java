@@ -39,6 +39,11 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
+    public Optional<Film> findById(Long id) {
+        return filmStorage.findById(id);
+    }
+
+    @Override
     public void addLike(long filmId, long userId) {
         filmStorage.addLike(filmId, userId);
     }

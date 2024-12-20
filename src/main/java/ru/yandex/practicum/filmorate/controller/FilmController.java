@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -29,6 +30,11 @@ public class FilmController {
     @GetMapping
     public Collection<Film> findAll() {
         return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Film> findById(@PathVariable Long id) {
+        return service.findById(id);
     }
 
     @PostMapping

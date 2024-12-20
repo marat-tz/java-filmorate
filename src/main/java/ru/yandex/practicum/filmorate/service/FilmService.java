@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface FilmService {
 
@@ -12,6 +13,8 @@ public interface FilmService {
     Film update(Film film);
 
     Collection<Film> findAll();
+
+    Optional<Film> findById(Long id);
 
     void addLike(long filmId, long userId);
 
