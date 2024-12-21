@@ -14,7 +14,7 @@ public interface FilmService {
 
     Collection<Film> findAll();
 
-    Optional<Film> findById(Long id);
+    Film findById(Long id);
 
     void addLike(long filmId, long userId);
 

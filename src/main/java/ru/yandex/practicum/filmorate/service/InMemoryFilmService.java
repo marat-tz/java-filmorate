@@ -39,7 +39,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public Optional<Film> findById(Long id) {
+    public Film findById(Long id) {
         return filmStorage.findById(id);
     }
 

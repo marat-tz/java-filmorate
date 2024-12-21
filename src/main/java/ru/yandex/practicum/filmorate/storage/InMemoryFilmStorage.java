@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -14,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -38,11 +40,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findById(long id) {
+    public Film findById(Long id) {
         if (films.containsKey(id)) {
-            return Optional.of(films.get(id));
+            return films.get(id);
         }
-        return Optional.empty();
+        throw new NotFoundException("Фильм не найден");
     }
 
     @Override
@@ -72,11 +74,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void addLike(long filmId, long userId) {
-        Optional<Film> film = findFilm(filmId);
+        Film film = findFilm(filmId);
         Optional<User> user = findUser(userId);
 
-        if (film.isPresent() && user.isPresent()) {
-            film.get().getLikes().add(userId);
+        if (Objects.nonNull(film) && user.isPresent()) {
+            film.getLikes().add(userId);
 
             log.info("Пользователь с id = {} поставил лайк фильму с id = {}", userId, filmId);
             //return film.get();
@@ -93,11 +95,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void removeLike(long filmId, long userId) {
-        Optional<Film> film = findFilm(filmId);
+        Film film = findFilm(filmId);
         Optional<User> user = findUser(userId);
 
-        if (film.isPresent() && user.isPresent()) {
-            film.get().getLikes().remove(userId);
+        if (Objects.nonNull(film) && user.isPresent()) {
+            film.getLikes().remove(userId);
 
             log.info("Пользователь с id = {} удалил лайк фильму с id = {}", userId, filmId);
 
@@ -127,7 +129,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .toList();
     }
 
-    private Optional<Film> findFilm(long id) {
+    private Film findFilm(long id) {
         return filmStorage.findById(id);
     }
 

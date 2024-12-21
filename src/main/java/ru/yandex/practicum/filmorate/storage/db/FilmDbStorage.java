@@ -49,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findById(Long id) {
+    public Film findById(Long id) {
         String sqlQuery = "SELECT id, name, description, releaseDate, duration " +
                 "from films where id = ?";
 
@@ -57,7 +57,7 @@ public class FilmDbStorage implements FilmStorage {
                 this::mapRowToFilm, id));
 
         if (resultFilm.isPresent()) {
-            return resultFilm;
+            return resultFilm.get();
 
         } else {
             throw new NotFoundException("Фильм с id = " + id + " не найден");
@@ -260,11 +260,8 @@ public class FilmDbStorage implements FilmStorage {
         // TODO: заполнить список через стрим с количеством count записей
         // вместо findById использовать findAll
         for (Long id : filmIds) {
-            if (findById(id).isPresent()) {
-                result.add(findById(id).get());
-            }
+            result.add(findById(id));
         }
-
         return result;
     }
 

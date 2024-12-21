@@ -10,7 +10,7 @@ public interface FilmStorage {
 
     Collection<Film> findAll();
 
-    Optional<Film> findById(Long id);
+    Film findById(Long id);
 
     Film create(Film film);
 
