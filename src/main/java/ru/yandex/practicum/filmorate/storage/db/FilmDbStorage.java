@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.PreparedStatement;
@@ -34,17 +36,13 @@ import java.util.Optional;
 // мапперы и методы, позволяющие сохранять фильмы в базу данных и получать их из неё.
 @Slf4j
 @Component("filmDbStorage")
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final FilmMapper mapper;
     private final MpaStorage mpaStorage;
-
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmMapper mapper, MpaStorage mpaStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.mapper = mapper;
-        this.mpaStorage = mpaStorage;
-    }
+    private final GenreStorage genreStorage;
 
     @Override
     public Collection<Film> findAll() {
@@ -272,6 +270,17 @@ public class FilmDbStorage implements FilmStorage {
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Integer mpaId = resultSet.getInt("mpa_id");
         Mpa mpa = mpaStorage.findById(mpaId);
+
+        String filmGenresQuery = "SELECT genre_id, " +
+                "FROM film_genre " +
+                "WHERE film_id = ? ";
+
+        List<Long> genreIds = jdbcTemplate.queryForList(filmGenresQuery, Long.class);
+
+        // выгрузить из таблицы genres все наименования, соответствующие айдишкам в списке
+        List<Genre> genres = genreStorage.findAll().stream().toList();
+
+        
 
         return Film.builder()
                 .id(resultSet.getLong("id"))
