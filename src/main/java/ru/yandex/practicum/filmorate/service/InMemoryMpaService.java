@@ -26,7 +26,7 @@ public class InMemoryMpaService implements MpaService {
     }
 
     @Override
-    public Optional<Mpa> findById(Long id) {
+    public Mpa findById(Integer id) {
         return storage.findById(id);
     }
 

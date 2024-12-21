@@ -12,7 +12,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,21 +38,23 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final FilmMapper mapper;
+    private final MpaStorage mpaStorage;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmMapper mapper) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmMapper mapper, MpaStorage mpaStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = mapper;
+        this.mpaStorage = mpaStorage;
     }
 
     @Override
     public Collection<Film> findAll() {
-        String sqlQuery = "SELECT id, name, description, releaseDate, duration from films";
+        String sqlQuery = "SELECT id, name, description, releaseDate, duration, mpa_id from films";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
     @Override
     public Film findById(Long id) {
-        String sqlQuery = "SELECT id, name, description, releaseDate, duration " +
+        String sqlQuery = "SELECT id, name, description, releaseDate, duration, mpa_id " +
                 "from films where id = ?";
 
         Optional<Film> resultFilm = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
@@ -266,12 +270,16 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        Integer mpaId = resultSet.getInt("mpa_id");
+        Mpa mpa = mpaStorage.findById(mpaId);
+
         return Film.builder()
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .releaseDate(LocalDate.parse(resultSet.getString("releaseDate")))
                 .duration(resultSet.getInt("duration"))
+                .mpa(mpa)
                 .build();
     }
 

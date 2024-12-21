@@ -9,7 +9,7 @@ public interface MpaService {
 
     Collection<Mpa> findAll();
 
-    Optional<Mpa> findById(Long id);
+    Mpa findById(Integer id);
 
     Mpa getNameById(Long id);
 

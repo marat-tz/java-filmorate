@@ -34,7 +34,7 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Optional<Mpa> findById(Long id) {
+    public Mpa findById(Integer id) {
         String sqlQuery = "SELECT id, name " +
                 "FROM mpa where id = ?";
 
@@ -42,7 +42,7 @@ public class MpaDbStorage implements MpaStorage {
                 this::mapRowToMpa, id));
 
         if (resultMpa.isPresent()) {
-            return resultMpa;
+            return resultMpa.get();
 
         } else {
             throw new NotFoundException("Mpa с id = " + id + " не найден");
@@ -73,7 +73,7 @@ public class MpaDbStorage implements MpaStorage {
         }
     }
 
-    private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
+    public Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
