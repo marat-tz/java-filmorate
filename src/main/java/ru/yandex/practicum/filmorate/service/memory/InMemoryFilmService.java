@@ -1,17 +1,14 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.memory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.service.interfaces.FilmService;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -19,7 +16,7 @@ public class InMemoryFilmService implements FilmService {
 
     private final FilmStorage filmStorage;
 
-    public InMemoryFilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public InMemoryFilmService(@Qualifier("memoryFilmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 

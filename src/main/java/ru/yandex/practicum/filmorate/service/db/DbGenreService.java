@@ -1,22 +1,22 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.db;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.service.interfaces.GenreService;
+import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
 
 import java.util.Collection;
 import java.util.Optional;
 
 @Slf4j
 @Service
-public class InMemoryGenreService implements GenreService {
+public class DbGenreService implements GenreService {
 
     private final GenreStorage genreStorage;
 
-    public InMemoryGenreService(@Qualifier("genreDbStorage") GenreStorage genreStorage) {
+    public DbGenreService(@Qualifier("genreDbStorage") GenreStorage genreStorage) {
         this.genreStorage = genreStorage;
     }
 

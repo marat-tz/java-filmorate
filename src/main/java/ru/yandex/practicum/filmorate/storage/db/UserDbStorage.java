@@ -2,24 +2,20 @@ package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -153,6 +149,26 @@ public class UserDbStorage implements UserStorage {
             log.error("Пользователь с id = {} не найден", userId);
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
+    }
+
+    @Override
+    public User addFriend(long mainUserId, long friendUserId) {
+        return null;
+    }
+
+    @Override
+    public User removeFriend(long mainUserId, long friendUserId) {
+        return null;
+    }
+
+    @Override
+    public Collection<User> getCommonFriends(long firstUserId, long secondUserId) {
+        return null;
+    }
+
+    @Override
+    public Collection<User> getFriends(long userId) {
+        return null;
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

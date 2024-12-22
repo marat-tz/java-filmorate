@@ -2,26 +2,22 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.service.interfaces.UserService;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
-@Service
-public class InMemoryUserService implements UserService {
+@Service("dbUserService")
+public class DbUserService implements UserService {
 
     @Qualifier("userDbStorage")
     private final UserStorage storage;
 
-    public InMemoryUserService(@Qualifier("userDbStorage") UserStorage storage) {
+    public DbUserService(@Qualifier("userDbStorage") UserStorage storage) {
         this.storage = storage;
     }
 

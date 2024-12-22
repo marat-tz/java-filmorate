@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.model.User;

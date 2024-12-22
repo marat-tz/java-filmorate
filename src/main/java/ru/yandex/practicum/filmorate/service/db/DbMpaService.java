@@ -1,22 +1,21 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.db;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.service.interfaces.MpaService;
+import ru.yandex.practicum.filmorate.storage.interfaces.MpaStorage;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @Service
-public class InMemoryMpaService implements MpaService {
+public class DbMpaService implements MpaService {
 
     private final MpaStorage storage;
 
-    public InMemoryMpaService(@Qualifier("mpaDbStorage") MpaStorage storage) {
+    public DbMpaService(@Qualifier("mpaDbStorage") MpaStorage storage) {
         this.storage = storage;
     }
 

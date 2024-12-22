@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.InMemoryUserService;
+import ru.yandex.practicum.filmorate.service.interfaces.UserService;
 
 import java.util.Collection;
 
@@ -19,9 +19,9 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
 
-    private final InMemoryUserService service;
+    private final UserService service;
 
-    public UserController(InMemoryUserService service) {
+    public UserController(@Qualifier("dbUserService") UserService service) {
         this.service = service;
     }
 
