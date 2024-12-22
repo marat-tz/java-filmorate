@@ -270,17 +270,22 @@ public class FilmDbStorage implements FilmStorage {
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Integer mpaId = resultSet.getInt("mpa_id");
         Mpa mpa = mpaStorage.findById(mpaId);
+        List<Genre> result = new ArrayList<>();
 
         String filmGenresQuery = "SELECT genre_id, " +
                 "FROM film_genre " +
                 "WHERE film_id = ? ";
 
-        List<Long> genreIds = jdbcTemplate.queryForList(filmGenresQuery, Long.class);
+        List<Long> genreIds = jdbcTemplate.queryForList(filmGenresQuery, Long.class, resultSet.getLong("id"));
 
         // выгрузить из таблицы genres все наименования, соответствующие айдишкам в списке
         List<Genre> genres = genreStorage.findAll().stream().toList();
 
-        
+        for (Genre genre : genres) {
+            if (genreIds.contains(genre.getId())) {
+                result.add(genre);
+            }
+        }
 
         return Film.builder()
                 .id(resultSet.getLong("id"))
@@ -289,6 +294,7 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(LocalDate.parse(resultSet.getString("releaseDate")))
                 .duration(resultSet.getInt("duration"))
                 .mpa(mpa)
+                .genres(result)
                 .build();
     }
 
