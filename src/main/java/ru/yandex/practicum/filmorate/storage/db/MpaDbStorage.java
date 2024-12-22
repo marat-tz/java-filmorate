@@ -35,18 +35,18 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa findById(Integer id) {
+        Optional<Mpa> resultMpa;
         String sqlQuery = "SELECT id, name " +
                 "FROM mpa where id = ?";
 
-        Optional<Mpa> resultMpa = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
-                this::mapRowToMpa, id));
-
-        if (resultMpa.isPresent()) {
-            return resultMpa.get();
-
-        } else {
-            throw new NotFoundException("Mpa с id = " + id + " не найден");
+        try {
+            resultMpa = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
+                    this::mapRowToMpa, id));
+        } catch (EmptyResultDataAccessException e) {
+            resultMpa = Optional.empty();
         }
+
+        return resultMpa.orElse(null);
     }
 
     @Override

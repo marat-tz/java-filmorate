@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -24,11 +25,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,6 +43,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findAll() {
+        log.info("Старт метода Collection<Film> findAll()");
         String sqlQuery = "SELECT id, name, description, releaseDate, duration, mpa_id from films";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
@@ -53,7 +51,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findById(Long id) {
         String sqlQuery = "SELECT id, name, description, releaseDate, duration, mpa_id " +
-                "from films where id = ?";
+                "FROM films WHERE id = ?";
 
         Optional<Film> resultFilm = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
                 this::mapRowToFilm, id));
@@ -92,29 +90,36 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException("Ошибка добавления фильма в таблицу");
         }
 
-        String sqlQueryGenreIds = "SELECT id from genres where id = ?";
-        List<Long> existIdGenres = new ArrayList<>();
-        Long genreId;
+        List<Long> genres = genreStorage.findIds().stream().toList();
+        List<Genre> filmGenres = film.getGenres();
+        List<Genre> resultGenres = new ArrayList<>();
 
-        if (Objects.nonNull(film.getGenres())) {
-            // TODO: вместо цикла с запросом, нужно один раз получить все данные из таблицы с жанрами и пройтись по ней
-            for (Genre genre : film.getGenres()) {
-                try {
-                    genreId = jdbcTemplate.queryForObject(sqlQueryGenreIds, Long.class, genre.getId());
-                } catch (EmptyResultDataAccessException e) {
-                    genreId = null;
+        if (Objects.nonNull(filmGenres)) {
+            for (Genre filmGenre : filmGenres) {
+                if (genres.contains(filmGenre.getId())) {
+                    resultGenres.add(filmGenre);
+                } else {
+                    throw new ValidationException("Жанра с id = " + filmGenre.getId() + " не существует");
                 }
-
-                if (Objects.nonNull(genreId)) {
-                    existIdGenres.add(genreId);
-                    // TODO: если айдишка существует, то добавить в film_genres
-                }
-            }
-
-            if (existIdGenres.isEmpty()) {
-                throw new ValidationException("Жанры с указанным id не существуют");
             }
         }
+
+        String sqlQueryFilmGenres = "INSERT INTO film_genre(film_id, genre_id) " +
+                "values (?, ?)";
+
+        // вот тут нужна пакетная операция, если нужно положить в таблицу сразу много записей
+        jdbcTemplate.batchUpdate(sqlQueryFilmGenres, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                preparedStatement.setLong(1, filmId);
+                preparedStatement.setLong(2, resultGenres.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return resultGenres.size();
+            }
+        });
 
         String sqlQueryMpaIds = "SELECT id from mpa";
         List<Long> mpaIdList = jdbcTemplate.queryForList(sqlQueryMpaIds, Long.class);
@@ -130,7 +135,7 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(film.getReleaseDate())
                 .duration(film.getDuration())
                 .mpa(film.getMpa())
-                .genres(film.getGenres())
+                .genres(resultGenres)
                 .build();
     }
 
@@ -267,18 +272,14 @@ public class FilmDbStorage implements FilmStorage {
         return result;
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        Integer mpaId = resultSet.getInt("mpa_id");
-        Mpa mpa = mpaStorage.findById(mpaId);
+    private List<Genre> getListGenreFromDbGenres(Long filmId) {
         List<Genre> result = new ArrayList<>();
 
         String filmGenresQuery = "SELECT genre_id, " +
                 "FROM film_genre " +
                 "WHERE film_id = ? ";
 
-        List<Long> genreIds = jdbcTemplate.queryForList(filmGenresQuery, Long.class, resultSet.getLong("id"));
-
-        // выгрузить из таблицы genres все наименования, соответствующие айдишкам в списке
+        List<Long> genreIds = jdbcTemplate.queryForList(filmGenresQuery, Long.class, filmId);
         List<Genre> genres = genreStorage.findAll().stream().toList();
 
         for (Genre genre : genres) {
@@ -286,6 +287,15 @@ public class FilmDbStorage implements FilmStorage {
                 result.add(genre);
             }
         }
+
+        return result;
+    }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        log.info("Старт метода Film mapRowToFilm(ResultSet resultSet, int rowNum)");
+        Integer mpaId = resultSet.getInt("mpa_id");
+        Mpa mpa = mpaStorage.findById(mpaId);
+        List<Genre> result = getListGenreFromDbGenres(resultSet.getLong("id"));
 
         return Film.builder()
                 .id(resultSet.getLong("id"))

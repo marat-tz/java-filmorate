@@ -30,6 +30,11 @@ public class GenreDbStorage implements GenreStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
 
+    public Collection<Long> findIds() {
+        String sqlQuery = "SELECT id from genres";
+        return jdbcTemplate.queryForList(sqlQuery, Long.class);
+    }
+
     @Override
     public Optional<Genre> findById(Long id) {
         return Optional.empty();
