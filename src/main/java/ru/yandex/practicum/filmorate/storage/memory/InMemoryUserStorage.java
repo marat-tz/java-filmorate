@@ -33,12 +33,12 @@ public class InMemoryUserStorage implements UserStorage {
         return users.values();
     }
 
-    private Optional<User> findUser(long userId) {
+    private Optional<User> findUser(Long userId) {
         return Optional.of(users.get(userId));
     }
 
     @Override
-    public Optional<User> findById(long id) {
+    public Optional<User> findById(Long id) {
         if (users.containsKey(id)) {
             return Optional.of(users.get(id));
         }
@@ -82,7 +82,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addFriend(long mainUserId, long friendUserId) {
+    public User addFriend(Long mainUserId, Long friendUserId) {
 
         if (mainUserId == friendUserId) {
             log.error("Нельзя добавить в друзья самого себя");
@@ -93,8 +93,8 @@ public class InMemoryUserStorage implements UserStorage {
         Optional<User> friendUser = findUser(friendUserId);
 
         if (mainUser.isPresent() && friendUser.isPresent()) {
-            mainUser.get().getFriendsId().add(friendUserId);
-            friendUser.get().getFriendsId().add(mainUserId);
+            mainUser.get().getFriends().add(friendUser.get());
+            friendUser.get().getFriends().add(mainUser.get());
 
             log.info("Пользователь с id = {} добавил в друзья пользователя с id = {}", mainUserId, friendUserId);
             return mainUser.get();
@@ -110,19 +110,19 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User removeFriend(long mainUserId, long friendUserId) {
+    public User removeFriend(Long mainUserId, Long friendUserId) {
 
         if (mainUserId == friendUserId) {
-            log.error("Нельзя добавить в друзья самого себя");
-            throw new ValidationException("Нельзя добавить в друзья самого себя");
+            log.error("Нельзя удалить из друзей самого себя");
+            throw new ValidationException("Нельзя удалить из друзей самого себя");
         }
 
         Optional<User> mainUser = findUser(mainUserId);
         Optional<User> friendUser = findUser(friendUserId);
 
         if (mainUser.isPresent() && friendUser.isPresent()) {
-            mainUser.get().getFriendsId().remove(friendUserId);
-            friendUser.get().getFriendsId().remove(mainUserId);
+            mainUser.get().getFriends().remove(friendUserId);
+            friendUser.get().getFriends().remove(mainUserId);
 
             log.info("Пользователь с id = {} удалил из друзей пользователя с id = {}", mainUserId, friendUserId);
             return mainUser.get();
@@ -138,23 +138,23 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getCommonFriends(long firstUserId, long secondUserId) {
+    public Collection<User> getCommonFriends(Long firstUserId, Long secondUserId) {
 
         Optional<User> firstUser = findUser(firstUserId);
         Optional<User> secondUser = findUser(secondUserId);
 
         if (firstUser.isPresent() && secondUser.isPresent()) {
-            Set<Long> firstFriends = firstUser.get().getFriendsId();
-            Set<Long> secondFriends = secondUser.get().getFriendsId();
+            Set<User> firstFriends = firstUser.get().getFriends();
+            Set<User> secondFriends = secondUser.get().getFriends();
 
-            List<Long> commonIds = firstFriends
+            List<User> commonUsers = firstFriends
                     .stream()
                     .filter(secondFriends::contains)
                     .toList();
 
             return findAll()
                     .stream()
-                    .filter(user -> commonIds.contains(user.getId()))
+                    .filter(commonUsers::contains)
                     .toList();
 
         } else if (firstUser.isEmpty()) {
@@ -168,16 +168,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getFriends(long userId) {
+    public Collection<User> getFriends(Long userId) {
 
         Optional<User> currentUser = findUser(userId);
 
         if (currentUser.isPresent()) {
-            Set<Long> friends = currentUser.get().getFriendsId();
+            Set<User> friends = currentUser.get().getFriends();
 
             return findAll()
                     .stream()
-                    .filter(user -> friends.contains(user.getId()))
+                    .filter(friends::contains)
                     .toList();
 
         } else {

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,8 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-// Напишите в DAO соответствующие
-// мапперы и методы, позволяющие сохранять фильмы в базу данных и получать их из неё.
 @Slf4j
 @Component("filmDbStorage")
 @RequiredArgsConstructor
@@ -73,6 +72,21 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQueryFilm = "INSERT INTO films(name, description, releaseDate, duration, mpa_id) " +
                 "values (?, ?, ?, ?, ?)";
 
+        String sqlQueryMpa = "SELECT COUNT(*) " +
+                "FROM mpa WHERE id = ?";
+
+        Integer count;
+
+        try {
+            count = jdbcTemplate.queryForObject(sqlQueryMpa, Integer.class, film.getMpa().getId());
+        } catch (EmptyResultDataAccessException e) {
+            throw new ValidationException("MPA id не существует");
+        }
+
+        if (Objects.isNull(count) || count == 0) {
+            throw new ValidationException("MPA id не существует");
+        }
+
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQueryFilm, new String[]{"id"});
             stmt.setString(1, film.getName());
@@ -86,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
         if (Objects.nonNull(keyHolder.getKey())) {
             filmId = keyHolder.getKey().longValue();
         } else {
-            throw new NotFoundException("Ошибка добавления фильма в таблицу");
+            throw new ValidationException("Ошибка добавления фильма в таблицу");
         }
 
         List<Long> genres = genreStorage.findIds().stream().toList();
@@ -120,6 +134,7 @@ public class FilmDbStorage implements FilmStorage {
             }
         });
 
+        // TODO: перенести в dbMpa
         String sqlQueryMpaIds = "SELECT id from mpa";
         List<Long> mpaIdList = jdbcTemplate.queryForList(sqlQueryMpaIds, Long.class);
         if (Objects.nonNull(film.getMpa()) && !mpaIdList.contains(film.getMpa().getId())) {
@@ -261,6 +276,7 @@ public class FilmDbStorage implements FilmStorage {
                 "ORDER BY likes DESC ";
 
         List<Long> filmIds = jdbcTemplate.queryForObject(filmLikesQuery, this::mapRowToLikes);
+
         List<Film> result = new ArrayList<>();
 
         // TODO: заполнить список через стрим с количеством count записей

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.interfaces;
 
-import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -10,18 +9,18 @@ public interface UserStorage {
 
     Collection<User> findAll();
 
-    Optional<User> findById(long id);
+    Optional<User> findById(Long id);
 
     User create(User user);
 
     User update(User newUser);
 
-    User addFriend(long mainUserId, long friendUserId);
+    User addFriend(Long mainUserId, Long friendUserId);
 
-    User removeFriend(long mainUserId, long friendUserId);
+    User removeFriend(Long mainUserId, Long friendUserId);
 
-    Collection<User> getCommonFriends(long firstUserId, long secondUserId);
+    Collection<User> getCommonFriends(Long firstUserId, Long secondUserId);
 
-    Collection<User> getFriends(long userId);
+    Collection<User> getFriends(Long userId);
 
 }

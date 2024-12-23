@@ -1,8 +1,9 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.db;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.interfaces.UserService;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
@@ -21,17 +22,17 @@ public class DbUserService implements UserService {
         this.storage = storage;
     }
 
-    private Optional<User> findUser(long userId) {
-        return storage.findById(userId);
-    }
-
     @Override
-    public Collection<User> getFriends(long userId) {
+    public Collection<User> getFriends(Long userId) {
+        if (findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
+        }
+
         return storage.getFriends(userId);
     }
 
     @Override
-    public Collection<User> getCommonFriends(long firstUserId, long secondUserId) {
+    public Collection<User> getCommonFriends(Long firstUserId, Long secondUserId) {
         return storage.getCommonFriends(firstUserId, secondUserId);
     }
 
@@ -51,17 +52,17 @@ public class DbUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findById(long id) {
+    public Optional<User> findById(Long id) {
         return storage.findById(id);
     }
 
     @Override
-    public User addFriend(long mainUserId, long friendUserId) {
+    public User addFriend(Long mainUserId, Long friendUserId) {
         return storage.addFriend(mainUserId, friendUserId);
     }
 
     @Override
-    public User removeFriend(long mainUserId, long friendUserId) {
+    public User removeFriend(Long mainUserId, Long friendUserId) {
         return storage.removeFriend(mainUserId, friendUserId);
     }
 }

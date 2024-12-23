@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service.interfaces;
 
-import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -8,9 +7,9 @@ import java.util.Optional;
 
 public interface UserService {
 
-    Collection<User> getFriends(long userId);
+    Collection<User> getFriends(Long userId);
 
-    Collection<User> getCommonFriends(long firstUserId, long secondUserId);
+    Collection<User> getCommonFriends(Long firstUserId, Long secondUserId);
 
     User create(User user);
 
@@ -18,10 +17,10 @@ public interface UserService {
 
     Collection<User> findAll();
 
-    Optional<User> findById(long id);
+    Optional<User> findById(Long id);
 
-    User addFriend(long mainUserId, long friendUserId);
+    User addFriend(Long mainUserId, Long friendUserId);
 
-    User removeFriend(long mainUserId, long friendUserId);
+    User removeFriend(Long mainUserId, Long friendUserId);
 
 }

@@ -21,17 +21,17 @@ public class InMemoryUserService implements UserService {
         this.storage = storage;
     }
 
-    private Optional<User> findUser(long userId) {
+    private Optional<User> findUser(Long userId) {
         return storage.findById(userId);
     }
 
     @Override
-    public Collection<User> getFriends(long userId) {
+    public Collection<User> getFriends(Long userId) {
         return storage.getFriends(userId);
     }
 
     @Override
-    public Collection<User> getCommonFriends(long firstUserId, long secondUserId) {
+    public Collection<User> getCommonFriends(Long firstUserId, Long secondUserId) {
         return storage.getCommonFriends(firstUserId, secondUserId);
     }
 
@@ -51,17 +51,17 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findById(long id) {
+    public Optional<User> findById(Long id) {
         return storage.findById(id);
     }
 
     @Override
-    public User addFriend(long mainUserId, long friendUserId) {
+    public User addFriend(Long mainUserId, Long friendUserId) {
         return storage.addFriend(mainUserId, friendUserId);
     }
 
     @Override
-    public User removeFriend(long mainUserId, long friendUserId) {
+    public User removeFriend(Long mainUserId, Long friendUserId) {
         return storage.removeFriend(mainUserId, friendUserId);
     }
 }
