@@ -21,7 +21,7 @@ import java.util.Set;
 public class Film {
 
     Long id;
-    Set<Long> likes = new HashSet<>();
+    Long likes;
 
     @NotBlank(message = "Название не может быть пустым")
     String name;

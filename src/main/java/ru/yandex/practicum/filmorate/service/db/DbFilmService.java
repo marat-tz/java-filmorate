@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.interfaces.FilmService;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.util.Collection;
@@ -15,9 +16,11 @@ import java.util.List;
 public class DbFilmService implements FilmService {
 
     private final FilmStorage filmStorage;
+    private final FilmLikeStorage filmLikeStorage;
 
-    public DbFilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public DbFilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, FilmLikeStorage filmLikeStorage) {
         this.filmStorage = filmStorage;
+        this.filmLikeStorage = filmLikeStorage;
     }
 
     @Override
@@ -42,17 +45,17 @@ public class DbFilmService implements FilmService {
 
     @Override
     public void addLike(long filmId, long userId) {
-        filmStorage.addLike(filmId, userId);
+        filmLikeStorage.addLike(filmId, userId);
     }
 
     @Override
     public void removeLike(long filmId, long userId) {
-        filmStorage.removeLike(filmId, userId);
+        filmLikeStorage.removeLike(filmId, userId);
     }
 
     @Override
     public List<Film> getPopularFilms(Long count) {
-        return filmStorage.getPopularFilms(count);
+        return filmLikeStorage.getPopularFilms(count);
     }
 
 }

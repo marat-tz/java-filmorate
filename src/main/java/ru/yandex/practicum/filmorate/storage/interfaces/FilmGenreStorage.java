@@ -4,18 +4,16 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
-public interface GenreStorage {
+public interface FilmGenreStorage {
 
     Collection<Genre> findAll();
 
-    Collection<Long> findIds();
+    Collection<Genre> findByFilmId(Long id);
 
-    Optional<Genre> findById(Long id);
+    void addGenresInFilmGenres(Film film, Long newId);
 
-    Genre getNameById(Long id);
-
-    Collection<Genre> getExistGenres(Film film);
+    List<Genre> getListGenreFromDbGenres(Long filmId);
 
 }

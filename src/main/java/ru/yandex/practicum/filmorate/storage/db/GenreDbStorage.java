@@ -1,32 +1,37 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mappers.GenreRowMappers;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @Component("genreDbStorage")
+@RequiredArgsConstructor
 public class GenreDbStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final GenreRowMappers genreRowMappers;
 
     @Override
     public Collection<Genre> findAll() {
         String sqlQuery = "SELECT * from genres";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
+        return jdbcTemplate.query(sqlQuery, genreRowMappers::mapRowToGenre);
     }
 
     public Collection<Long> findIds() {
@@ -49,7 +54,7 @@ public class GenreDbStorage implements GenreStorage {
 
         try {
             resultGenre = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
-                    this::mapRowToGenre, id));
+                    genreRowMappers::mapRowToGenre, id));
         } catch (EmptyResultDataAccessException e) {
             resultGenre = Optional.empty();
         }
@@ -63,10 +68,22 @@ public class GenreDbStorage implements GenreStorage {
         }
     }
 
-    private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        return Genre.builder()
-                .id(resultSet.getLong("id"))
-                .name(resultSet.getString("name"))
-                .build();
+    @Override
+    public Collection<Genre> getExistGenres(Film film) {
+        List<Long> genres = findIds().stream().toList();
+        List<Genre> filmGenres = film.getGenres();
+        List<Genre> resultGenres = new ArrayList<>();
+
+        if (Objects.nonNull(filmGenres)) {
+            filmGenres.forEach(genre -> {
+                        if (genres.contains(genre.getId())) {
+                            resultGenres.add(genre);
+                        } else {
+                            throw new ValidationException("Указанный жанр не существует");
+                        }
+                    }
+            );
+        }
+        return resultGenres;
     }
 }

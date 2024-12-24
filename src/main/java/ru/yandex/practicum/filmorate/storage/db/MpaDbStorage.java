@@ -5,12 +5,15 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.interfaces.MpaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -43,6 +46,26 @@ public class MpaDbStorage implements MpaStorage {
         }
 
         return resultMpa.orElse(null);
+    }
+
+    @Override
+    public Integer getCountById(Film film) {
+        log.info("Проверка существования mpa_id = {} в таблице mpa", film.getMpa().getId());
+        Integer count;
+        final String sqlQueryMpa = "SELECT COUNT(*) " +
+                "FROM mpa WHERE id = ?";
+
+        try {
+            count = jdbcTemplate.queryForObject(sqlQueryMpa, Integer.class, film.getMpa().getId());
+        } catch (EmptyResultDataAccessException e) {
+            throw new ValidationException("MPA id не существуют");
+        }
+
+        if (Objects.isNull(count) || count == 0) {
+            throw new ValidationException("MPA id не существует");
+        }
+
+        return count;
     }
 
     @Override
