@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.interfaces.UserService;
+import ru.yandex.practicum.filmorate.storage.interfaces.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.Collection;
@@ -17,9 +18,11 @@ public class DbUserService implements UserService {
 
     @Qualifier("userDbStorage")
     private final UserStorage storage;
+    private final FriendshipStorage friendshipStorage;
 
-    public DbUserService(@Qualifier("userDbStorage") UserStorage storage) {
+    public DbUserService(@Qualifier("userDbStorage") UserStorage storage, FriendshipStorage friendshipStorage) {
         this.storage = storage;
+        this.friendshipStorage = friendshipStorage;
     }
 
     @Override
@@ -28,12 +31,12 @@ public class DbUserService implements UserService {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
 
-        return storage.getFriends(userId);
+        return friendshipStorage.getFriends(userId);
     }
 
     @Override
     public Collection<User> getCommonFriends(Long firstUserId, Long secondUserId) {
-        return storage.getCommonFriends(firstUserId, secondUserId);
+        return friendshipStorage.getCommonFriends(firstUserId, secondUserId);
     }
 
     @Override
@@ -58,11 +61,11 @@ public class DbUserService implements UserService {
 
     @Override
     public User addFriend(Long mainUserId, Long friendUserId) {
-        return storage.addFriend(mainUserId, friendUserId);
+        return friendshipStorage.addFriend(mainUserId, friendUserId);
     }
 
     @Override
     public User removeFriend(Long mainUserId, Long friendUserId) {
-        return storage.removeFriend(mainUserId, friendUserId);
+        return friendshipStorage.removeFriend(mainUserId, friendUserId);
     }
 }
