@@ -79,9 +79,9 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
         log.info("Пользователь с id = {} пытается удалить свой лайк фильму с id = {}", userId, filmId);
 
         String filmLikeQuery = "SELECT user_id FROM film_like WHERE film_id = ?";
-        List<Long> filmCount = jdbcTemplate.queryForList(filmLikeQuery, Long.class, filmId);
+        List<Long> userIds = jdbcTemplate.queryForList(filmLikeQuery, Long.class, filmId);
 
-        if (filmCount.contains(userId)) {
+        if (userIds.contains(userId)) {
             String filmLikeRemoveQuery = "DELETE FROM film_like WHERE user_id = ? AND film_id = ?";
             int rows = jdbcTemplate.update(filmLikeRemoveQuery, userId, filmId);
 
