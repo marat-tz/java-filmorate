@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.GenreRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @Slf4j
 @Component("genreDbStorage")
 @RequiredArgsConstructor
-public class GenreDbStorage implements GenreStorage {
+public class GenreDbStorageImpl implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreRowMappers genreRowMappers;

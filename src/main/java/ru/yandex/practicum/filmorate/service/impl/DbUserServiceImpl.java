@@ -1,26 +1,26 @@
-package ru.yandex.practicum.filmorate.service.db;
+package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.interfaces.UserService;
-import ru.yandex.practicum.filmorate.storage.interfaces.FriendshipStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.Optional;
 
 @Slf4j
 @Service("dbUserService")
-public class DbUserService implements UserService {
+public class DbUserServiceImpl implements UserService {
 
     @Qualifier("userDbStorage")
     private final UserStorage storage;
     private final FriendshipStorage friendshipStorage;
 
-    public DbUserService(@Qualifier("userDbStorage") UserStorage storage, FriendshipStorage friendshipStorage) {
+    public DbUserServiceImpl(@Qualifier("userDbStorage") UserStorage storage, FriendshipStorage friendshipStorage) {
         this.storage = storage;
         this.friendshipStorage = friendshipStorage;
     }

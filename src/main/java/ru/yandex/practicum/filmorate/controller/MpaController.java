@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.service.db.DbMpaService;
+import ru.yandex.practicum.filmorate.service.impl.DbMpaServiceImpl;
 
 import java.util.Collection;
 
@@ -13,9 +13,9 @@ import java.util.Collection;
 @RequestMapping("/mpa")
 public class MpaController {
 
-    private final DbMpaService service;
+    private final DbMpaServiceImpl service;
 
-    public MpaController(DbMpaService service) {
+    public MpaController(DbMpaServiceImpl service) {
         this.service = service;
     }
 

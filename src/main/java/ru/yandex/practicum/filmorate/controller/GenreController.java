@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.service.db.DbGenreService;
+import ru.yandex.practicum.filmorate.service.impl.DbGenreServiceImpl;
 
 import java.util.Collection;
 
@@ -13,9 +13,9 @@ import java.util.Collection;
 @RequestMapping("/genres")
 public class GenreController {
 
-    private final DbGenreService service;
+    private final DbGenreServiceImpl service;
 
-    public GenreController(DbGenreService service) {
+    public GenreController(DbGenreServiceImpl service) {
         this.service = service;
     }
 

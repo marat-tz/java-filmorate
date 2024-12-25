@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.interfaces.FilmGenreStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.FilmLikeStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

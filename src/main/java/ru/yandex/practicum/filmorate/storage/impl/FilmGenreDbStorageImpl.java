@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.mappers.GenreRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.interfaces.FilmGenreStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @Component("filmGenreDbStorage")
 @RequiredArgsConstructor
-public class FilmGenreDbStorage implements FilmGenreStorage {
+public class FilmGenreDbStorageImpl implements FilmGenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;

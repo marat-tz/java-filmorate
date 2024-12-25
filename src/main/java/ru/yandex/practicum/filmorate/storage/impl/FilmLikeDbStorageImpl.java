@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.interfaces.FilmLikeStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -19,12 +19,12 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-public class FilmLikeDbStorage implements FilmLikeStorage {
+public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final FilmStorage filmStorage;
 
-    public FilmLikeDbStorage(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage) {
+    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
     }

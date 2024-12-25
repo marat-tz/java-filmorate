@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.interfaces;
+package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.User;
 
