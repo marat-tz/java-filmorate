@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.mappers;
+package ru.yandex.practicum.filmorate.mappers.mapstruct;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
