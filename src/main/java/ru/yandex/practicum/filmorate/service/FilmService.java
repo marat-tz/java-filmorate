@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,5 +21,6 @@ public interface FilmService {
 
     void removeLike(long filmId, long userId);
 
-    List<Film> getPopularFilms(Long count);
+    List<Film> getPopularFilms(Long count, Long genreId, LocalDate year);
+
 }

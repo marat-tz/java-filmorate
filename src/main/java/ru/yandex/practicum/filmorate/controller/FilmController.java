@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,7 +59,9 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count) {
-        return service.getPopularFilms(count);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count,
+                                      @RequestParam Long genreId,
+                                      @RequestParam LocalDate year) {
+        return service.getPopularFilms(count, genreId, year);
     }
 }
