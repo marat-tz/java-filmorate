@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -25,9 +26,12 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmStorage filmStorage;
 
-    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage) {
+    private final FilmRowMappers filmRowMappers;
+
+    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage, @Lazy FilmRowMappers filmRowMappers) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
+        this.filmRowMappers = filmRowMappers;
     }
 
     @Override
@@ -96,7 +100,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms(Long count, Long genreId, LocalDate year) {
+    public List<Film> getPopularFilms(Long count, Long genreId, Long year) {
         log.info("Получение популярных фильмов в количестве {}", count);
 
         if (count <= 0) {
@@ -104,52 +108,18 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
             throw new ValidationException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
         }
 
-        final String filmLikesQuery = "SELECT film_id, " +
+        final String filmLikesQuery = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
+                "FROM films AS f " +
+                "RIGHT OUTER JOIN film_like AS fl ON f.id = fl.film_id " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(f.id) DESC";
+
+        final String filmLikesQueryTemp = "SELECT film_id, " +
                 "COUNT(film_id) AS likes " +
                 "FROM film_like " +
                 "GROUP BY film_id " +
                 "ORDER BY likes DESC ";
 
-        List<Long> filmIds = jdbcTemplate.query(filmLikesQuery, rs -> {
-            List<Long> ids = new ArrayList<>();
-            while (rs.next()) {
-                ids.add(rs.getLong("film_id"));
-            }
-            return ids;
-        });
-
-        List<Film> result = new ArrayList<>();
-        List<Film> allFilms = filmStorage.findAll().stream().toList();
-
-        allFilms.forEach(film -> {
-            if (Objects.requireNonNull(filmIds).contains(film.getId())) {
-                result.add(film);
-            }
-        });
-
-        result.sort(new Comparator<Film>() {
-            @Override
-            public int compare(Film f1, Film f2) {
-                Long likes1 = f1.getLikes();
-                Long likes2 = f2.getLikes();
-
-                if (Objects.isNull(likes1)) {
-                    likes1 = 0L;
-                }
-
-                if (Objects.isNull(likes2)) {
-                    likes2 = 0L;
-                }
-
-                return likes1.compareTo(likes2);
-            }
-        });
-
-        Collections.reverse(result);
-        for (Film f : result) {
-            log.info("Количество лайков фильма " + f.getId() + " равно " + f.getLikes());
-        }
-
-        return result;
+        return jdbcTemplate.query(filmLikesQuery, filmRowMappers::mapRowToFilm).stream().toList();
     }
 }

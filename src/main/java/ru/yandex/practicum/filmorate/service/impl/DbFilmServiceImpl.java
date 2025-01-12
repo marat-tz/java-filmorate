@@ -56,7 +56,7 @@ public class DbFilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Long count, Long genreId, LocalDate year) {
+    public List<Film> getPopularFilms(Long count, Long genreId, Long year) {
         return filmLikeStorage.getPopularFilms(count, genreId, year);
     }
 
