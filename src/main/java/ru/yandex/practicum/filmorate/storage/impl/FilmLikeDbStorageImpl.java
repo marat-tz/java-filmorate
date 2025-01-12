@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -95,7 +96,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms(Long count) {
+    public List<Film> getPopularFilms(Long count, Long genreId, LocalDate year) {
         log.info("Получение популярных фильмов в количестве {}", count);
 
         if (count <= 0) {
