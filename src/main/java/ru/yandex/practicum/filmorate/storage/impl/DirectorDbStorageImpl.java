@@ -10,8 +10,13 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -108,9 +113,9 @@ public class DirectorDbStorageImpl implements DirectorStorage {
     @Override
     public void addDirectorsByFilm(Film film) {
         String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
-       for(Director director : film.getDirectors()){
-           jdbcTemplate.update(sqlQuery, film.getId(), director.getId());
-       }
+        for (Director director : film.getDirectors()) {
+            jdbcTemplate.update(sqlQuery, film.getId(), director.getId());
+        }
     }
 
     public Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {

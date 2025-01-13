@@ -156,7 +156,7 @@ public class FilmDbStorageImpl implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsByDirector(Long directorId, String sortBy){
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         String sqlQuery = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
                 "FROM film_director f_d " +
                 "LEFT JOIN films f " +
