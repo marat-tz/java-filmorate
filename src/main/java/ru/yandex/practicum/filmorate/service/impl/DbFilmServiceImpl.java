@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service("dbFilmService")
@@ -57,7 +59,14 @@ public class DbFilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getPopularFilms(Long count, Long genreId, Long year) {
+
+        if (count <= 0) {
+            log.error("Число отображаемых фильмов count не может быть меньше, либо равно 0");
+            throw new ValidationException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
+        }
+
         return filmLikeStorage.getPopularFilms(count, genreId, year);
+
     }
 
 }

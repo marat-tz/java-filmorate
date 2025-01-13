@@ -25,19 +25,30 @@ public class FilmRowMappers {
     private final FilmLikeStorage filmLikeStorage;
 
     public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+
         log.info("Старт метода Film mapRowToFilm(ResultSet resultSet, int rowNum)");
+
+        log.info("Получаем id рейтинга фильма с id = {}", resultSet.getLong("id"));
         Integer mpaId = resultSet.getInt("mpa_id");
+
+        log.info("Получаем рейтинг фильма с id = {}", resultSet.getLong("id"));
         Mpa mpa = mpaStorage.findById(mpaId);
+
+        log.info("Получаем список жанров фильма с id = {}", resultSet.getLong("id"));
         List<Genre> result = filmGenreStorage.getListGenreFromDbGenres(resultSet.getLong("id"));
-        log.info("Получаем количество лайков фильма по id = {}", resultSet.getLong("id"));
+
+        log.info("Получаем количество лайков фильма с id = {}", resultSet.getLong("id"));
         Long likes = filmLikeStorage.getLikesById(resultSet.getLong("id"));
+
+        log.info("Получаем дату выхода фильма с id = {}", resultSet.getLong("id"));
+        LocalDate date = LocalDate.parse(resultSet.getString("releaseDate"));
 
         return Film.builder()
                 .id(resultSet.getLong("id"))
                 .likes(likes)
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
-                .releaseDate(LocalDate.parse(resultSet.getString("releaseDate")))
+                .releaseDate(date)
                 .duration(resultSet.getInt("duration"))
                 .mpa(mpa)
                 .genres(result)
