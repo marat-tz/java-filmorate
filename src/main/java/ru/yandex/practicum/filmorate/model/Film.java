@@ -37,4 +37,6 @@ public class Film {
     Mpa mpa;
 
     List<Genre> genres;
+
+    List<Director> directors;
 }
