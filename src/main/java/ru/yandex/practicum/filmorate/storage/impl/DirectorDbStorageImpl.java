@@ -112,9 +112,11 @@ public class DirectorDbStorageImpl implements DirectorStorage {
 
     @Override
     public void addDirectorsByFilm(Film film) {
-        String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
-        for (Director director : film.getDirectors()) {
-            jdbcTemplate.update(sqlQuery, film.getId(), director.getId());
+        if (film.getDirectors() != null) {
+            String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
+            for (Director director : film.getDirectors()) {
+                jdbcTemplate.update(sqlQuery, film.getId(), director.getId());
+            }
         }
     }
 

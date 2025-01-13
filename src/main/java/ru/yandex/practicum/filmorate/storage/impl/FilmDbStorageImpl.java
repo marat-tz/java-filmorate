@@ -92,17 +92,8 @@ public class FilmDbStorageImpl implements FilmStorage {
         List<Genre> resultGenres = genreStorage.getExistGenres(film).stream().toList();
         directorStorage.addDirectorsByFilm(film);
 
-        log.info("Фильм c id = {} успешно добавлен", film.getId());
-        return Film.builder()
-                .id(filmId)
-                .name(film.getName())
-                .description(film.getDescription())
-                .releaseDate(film.getReleaseDate())
-                .duration(film.getDuration())
-                .mpa(film.getMpa())
-                .genres(resultGenres)
-                .directors(film.getDirectors())
-                .build();
+        log.info("Фильм c id = {} успешно добавлен", filmId);
+        return findById(filmId);
     }
 
     @Override
@@ -135,19 +126,10 @@ public class FilmDbStorageImpl implements FilmStorage {
             throw new NotFoundException("Ошибка обновления фильма");
         }
 
-        Film resultFilm = Film.builder()
-                .id(filmId)
-                .name(newFilm.getName())
-                .description(newFilm.getDescription())
-                .releaseDate(newFilm.getReleaseDate())
-                .duration(newFilm.getDuration())
-                .directors(newFilm.getDirectors())
-                .build();
-
         if (rows > 0) {
             log.info("Фильм с id = {} успешно обновлён", filmId);
-            directorStorage.updateDirectorsByFilm(resultFilm);
-            return resultFilm;
+            directorStorage.updateDirectorsByFilm(newFilm);
+            return findById(filmId);
 
         } else {
             log.error("Ошибка обновления фильма id = {}", filmId);
