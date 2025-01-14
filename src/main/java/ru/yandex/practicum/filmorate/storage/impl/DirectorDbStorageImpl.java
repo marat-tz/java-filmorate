@@ -1,17 +1,19 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.DirectorRowMappers;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
@@ -20,25 +22,23 @@ import java.util.Objects;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DirectorDbStorageImpl implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public DirectorDbStorageImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final DirectorRowMappers directorRowMappers;
 
     @Override
     public Collection<Director> findAll() {
         String sqlQuery = "SELECT id, name from directors";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToDirector);
+        return jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector);
     }
 
     @Override
     public Director getById(Long id) {
         String sqlQuery = "SELECT id, name from directors" +
                 " where id = ?";
-        Director director = jdbcTemplate.query(sqlQuery, this::mapRowToDirector, id)
+        Director director = jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector, id)
                 .stream().findAny().orElse(null);
 
         if (director == null) {
@@ -94,7 +94,7 @@ public class DirectorDbStorageImpl implements DirectorStorage {
                 "    ON f_d.director_id = d.id " +
                 "WHERE film_id = ? " +
                 "ORDER BY d.id ";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId).stream().toList();
+        return jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector, filmId).stream().toList();
     }
 
     @Override
@@ -113,17 +113,21 @@ public class DirectorDbStorageImpl implements DirectorStorage {
     @Override
     public void addDirectorsByFilm(Film film) {
         if (film.getDirectors() != null) {
-            String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
-            for (Director director : film.getDirectors()) {
-                jdbcTemplate.update(sqlQuery, film.getId(), director.getId());
-            }
-        }
-    }
 
-    public Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {
-        return Director.builder()
-                .id(resultSet.getLong("id"))
-                .name(resultSet.getString("name"))
-                .build();
+            String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
+
+            jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                    preparedStatement.setLong(1, film.getId());
+                    preparedStatement.setLong(2, film.getDirectors().get(i).getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return film.getDirectors().size();
+                }
+            });
+        }
     }
 }
