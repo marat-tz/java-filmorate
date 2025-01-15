@@ -44,8 +44,8 @@ public class FilmRowMappers {
         log.info("Получаем количество лайков фильма с id = {}", resultSet.getLong("id"));
         Long likes = filmLikeStorage.getLikesById(resultSet.getLong("id"));
 
+        log.info("Получаем режиссёров фильма с id = {}", resultSet.getLong("id"));
         List<Director> directors = directorStorage.getDirectorsByFilm(resultSet.getLong("id"));
-        log.info("Получаем количество лайков фильма по id = {}", resultSet.getLong("id"));
 
         log.info("Получаем дату выхода фильма с id = {}", resultSet.getLong("id"));
         LocalDate date = LocalDate.parse(resultSet.getString("releaseDate"));
