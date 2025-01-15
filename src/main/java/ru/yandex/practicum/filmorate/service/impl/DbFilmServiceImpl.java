@@ -58,4 +58,8 @@ public class DbFilmServiceImpl implements FilmService {
         return filmLikeStorage.getPopularFilms(count);
     }
 
+    @Override
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
 }
