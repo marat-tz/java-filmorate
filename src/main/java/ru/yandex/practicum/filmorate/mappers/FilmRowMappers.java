@@ -48,7 +48,10 @@ public class FilmRowMappers {
         List<Director> directors = directorStorage.getDirectorsByFilm(resultSet.getLong("id"));
 
         log.info("Получаем дату выхода фильма с id = {}", resultSet.getLong("id"));
-        LocalDate date = LocalDate.parse(resultSet.getString("releaseDate"));
+        LocalDate date = LocalDate.of(1895, 12,28);
+        if (resultSet.getString("releaseDate") != null) {
+            date = LocalDate.parse(resultSet.getString("releaseDate"));
+        }
 
         return Film.builder()
                 .id(resultSet.getLong("id"))
