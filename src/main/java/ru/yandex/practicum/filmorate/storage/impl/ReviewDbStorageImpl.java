@@ -37,8 +37,7 @@ public class ReviewDbStorageImpl implements ReviewStorage {
             ps.setLong(4, reviews.getFilmId());
             return ps;
         }, key);
-        reviews.setReviewId(Objects.requireNonNull(key.getKey()).longValue());
-        return reviews;
+        return getReviewById(Objects.requireNonNull(key.getKey()).longValue());
     }
 
     @Override

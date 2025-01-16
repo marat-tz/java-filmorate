@@ -10,7 +10,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 public class Review {
-    @Setter
     Long reviewId;
     @NotBlank
     String content;
