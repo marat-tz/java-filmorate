@@ -64,10 +64,10 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 
 CREATE TABLE IF NOT EXISTS useful(
-    useful_id INT NOT NULL,
+    review_id INT NOT NULL,
     like_id INT,
     dislike_id INT,
-    FOREIGN KEY(useful_id) REFERENCES reviews(id),
+    FOREIGN KEY(review_id) REFERENCES reviews(id),
     FOREIGN KEY(like_id) REFERENCES users(id),
     FOREIGN KEY(dislike_id) REFERENCES users(id)
 );

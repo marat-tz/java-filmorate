@@ -59,7 +59,7 @@ public class ReviewDbStorageImpl implements ReviewStorage {
 
     @Override
     public void deleteReview(Long id) {
-        final String DELETE_USEFUL_QUERY = "DELETE FROM useful WHERE useful_id = ?";
+        final String DELETE_USEFUL_QUERY = "DELETE FROM useful WHERE review_id = ?";
         jdbc.update(DELETE_USEFUL_QUERY, id);
 
         final String DELETE_REVIEW_QUERY = "DELETE FROM reviews WHERE id = ?";
@@ -75,7 +75,7 @@ public class ReviewDbStorageImpl implements ReviewStorage {
                 "FROM reviews r " +
                 "JOIN users u ON r.user_id = u.id " +
                 "JOIN films f ON r.film_id = f.id " +
-                "LEFT JOIN useful uf ON r.id = uf.useful_id " +
+                "LEFT JOIN useful uf ON r.id = uf.review_id " +
                 "WHERE r.id = ? " +
                 "GROUP BY r.id, r.content, r.is_positive, u.name, f.name, r.user_id, r.film_id";
 
@@ -93,7 +93,7 @@ public class ReviewDbStorageImpl implements ReviewStorage {
                 "FROM reviews r " +
                 "JOIN users u ON r.user_id = u.id " +
                 "JOIN films f ON r.film_id = f.id " +
-                "LEFT JOIN useful uf ON r.id = uf.useful_id " +
+                "LEFT JOIN useful uf ON r.id = uf.review_id " +
                 "WHERE r.film_id = ? " +
                 "GROUP BY r.id, r.content, r.is_positive, u.name, f.name, r.user_id, r.film_id " +
                 "LIMIT ?";
@@ -112,35 +112,39 @@ public class ReviewDbStorageImpl implements ReviewStorage {
 
     @Override
     public void likeToReview(Long reviewId, Long userId) {
-        String checkSql = "SELECT * FROM useful WHERE useful_id = ? AND (like_id = ? OR dislike_id = ?)";
-        List<Map<String, Object>> likeDislike = jdbc.queryForList(checkSql, reviewId, userId, userId);
+        String checkSql = "SELECT * FROM useful WHERE review_id = ? AND like_id = ? OR review_id = ? AND dislike_id = ?";
+        List<Map<String, Object>> likeDislike = jdbc.queryForList(checkSql, reviewId, userId, reviewId, userId);
         if (!likeDislike.isEmpty()) {
-            String updateSql = "UPDATE useful SET like_id = ?, dislike_id = ? WHERE useful_id = ? AND (like_id = ? OR dislike_id = ?)";
-            boolean isLike = likeDislike.get(0).get("like_id") != null;
-            jdbc.update(updateSql, isLike ? null : userId, isLike ? userId : null, reviewId, userId, userId);
+            String updateSql;
+            if (likeDislike.get(0).get("like_id") != null) {
+                updateSql = "UPDATE useful SET like_id = NULL, dislike_id = ? WHERE review_id = ? AND like_id = ?";
+                jdbc.update(updateSql, userId, reviewId, userId);
+            } else {
+                updateSql = "UPDATE useful SET dislike_id = NULL, like_id = ? WHERE review_id = ? AND dislike_id = ?";
+                jdbc.update(updateSql, userId, reviewId, userId);
+            }
         } else {
-            String insertSql = "INSERT INTO useful (useful_id, like_id, dislike_id) VALUES (?, ?, NULL)";
+            String insertSql = "INSERT INTO useful (review_id, like_id, dislike_id) VALUES (?, ?, NULL)";
             jdbc.update(insertSql, reviewId, userId);
         }
-
         log.info("Добавлен лайк у отзыва {} или обновлен для пользователя {}.", reviewId, userId);
     }
 
     @Override
     public void dislikeToReview(Long reviewId, Long userId) {
-        String checkSql = "SELECT * FROM useful WHERE useful_id = ? AND like_id = ? OR useful_id = ? AND dislike_id = ?";
+        String checkSql = "SELECT * FROM useful WHERE review_id = ? AND like_id = ? OR review_id = ? AND dislike_id = ?";
         List<Map<String, Object>> likeDislike = jdbc.queryForList(checkSql, reviewId, userId, reviewId, userId);
         if (!likeDislike.isEmpty()) {
             String updateSql;
             if (likeDislike.get(0).get("dislike_id") != null) {
-                updateSql = "UPDATE useful SET dislike_id = NULL, like_id = ? WHERE useful_id = ? AND dislike_id = ?";
+                updateSql = "UPDATE useful SET dislike_id = NULL, like_id = ? WHERE review_id = ? AND dislike_id = ?";
                 jdbc.update(updateSql, userId, reviewId, userId);
             } else {
-                updateSql = "UPDATE useful SET like_id = NULL, dislike_id = ? WHERE useful_id = ? AND like_id = ?";
+                updateSql = "UPDATE useful SET like_id = NULL, dislike_id = ? WHERE review_id = ? AND like_id = ?";
                 jdbc.update(updateSql, userId, reviewId, userId);
             }
         } else {
-            String insertSql = "INSERT INTO useful (useful_id, like_id, dislike_id) VALUES (?, NULL, ?)";
+            String insertSql = "INSERT INTO useful (review_id, like_id, dislike_id) VALUES (?, NULL, ?)";
             jdbc.update(insertSql, reviewId, userId);
         }
         log.info("Добавлен дизлайк у отзыва {} или обновлен для пользователя {}.", reviewId, userId);
@@ -148,14 +152,14 @@ public class ReviewDbStorageImpl implements ReviewStorage {
 
     @Override
     public void deleteLike(Long reviewId, Long userId) {
-        final String sql = "DELETE FROM useful WHERE useful_id = ? AND like_id = ?";
+        final String sql = "DELETE FROM useful WHERE review_id = ? AND like_id = ?";
         jdbc.update(sql, reviewId, userId);
         log.info("Лайк удален.");
     }
 
     @Override
     public void deleteDislike(Long reviewId, Long userId) {
-        final String sql = "DELETE FROM useful WHERE useful_id = ? AND dislike_id = ?";
+        final String sql = "DELETE FROM useful WHERE review_id = ? AND dislike_id = ?";
         jdbc.update(sql, reviewId, userId);
         log.info("Дислайк удален.");
     }

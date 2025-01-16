@@ -19,4 +19,5 @@ public class ErrorHandler {
     public ErrorResponse handlerNotFoundException(final NotFoundException e) {
         return new ErrorResponse("Not found exception", e.getMessage());
     }
+
 }
