@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS directors CASCADE;
 DROP TABLE IF EXISTS film_like CASCADE;
 DROP TABLE IF EXISTS film_genre CASCADE;
 DROP TABLE IF EXISTS film_mpa CASCADE;
+DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS useful CASCADE;
 DROP TABLE IF EXISTS film_director CASCADE;
 DROP TABLE IF EXISTS feed CASCADE;
 
@@ -61,6 +63,15 @@ CREATE TABLE IF NOT EXISTS reviews (
     film_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS useful(
+    useful_id INT NOT NULL,
+    like_id INT,
+    dislike_id INT,
+    FOREIGN KEY(useful_id) REFERENCES reviews(id),
+    FOREIGN KEY(like_id) REFERENCES users(id),
+    FOREIGN KEY(dislike_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS feed (
