@@ -70,4 +70,9 @@ public class DbFilmServiceImpl implements FilmService {
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
+
+    @Override
+    public List<Film> getFilmsByDirectorAndOrByTitle(String query, String by) {
+        return filmStorage.getFilmsByDirectorAndOrByTitle(query, by);
+    }
 }

@@ -112,6 +112,11 @@ public class DirectorDbStorageImpl implements DirectorStorage {
 
     @Override
     public void addDirectorsByFilm(Film film) {
+        addDirectorsByFilm(film, film.getId());
+    }
+
+    @Override
+    public void addDirectorsByFilm(Film film, long filmId) {
         if (film.getDirectors() != null) {
 
             String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
@@ -119,7 +124,7 @@ public class DirectorDbStorageImpl implements DirectorStorage {
             jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                    preparedStatement.setLong(1, film.getId());
+                    preparedStatement.setLong(1, filmId);
                     preparedStatement.setLong(2, film.getDirectors().get(i).getId());
                 }
 

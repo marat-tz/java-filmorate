@@ -15,10 +15,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component("filmDbStorage")
@@ -90,7 +87,7 @@ public class FilmDbStorageImpl implements FilmStorage {
         filmGenreStorage.addGenresInFilmGenres(film, filmId);
 
         List<Genre> resultGenres = genreStorage.getExistGenres(film).stream().toList();
-        directorStorage.addDirectorsByFilm(film);
+        directorStorage.addDirectorsByFilm(film, filmId);
 
         log.info("Фильм c id = {} успешно добавлен", filmId);
         return findById(filmId);
@@ -158,5 +155,37 @@ public class FilmDbStorageImpl implements FilmStorage {
 
         log.info(sqlQuery);
         return jdbcTemplate.query(sqlQuery, filmRowMappers::mapRowToFilm, directorId).stream().toList();
+    }
+
+    @Override
+    public List<Film> getFilmsByDirectorAndOrByTitle(String query, String by) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id FROM films f\n";
+
+        List<String> whereQuery = new ArrayList<>();
+        if (by.contains("director")) {
+            sqlQuery += " left join film_director f_d\n" +
+                    " On f_d.film_id = f.id\n" +
+                    " LEFT JOIN directors d\n" +
+                    " ON f_d.director_id = d.id\n";
+            whereQuery.add(" d.name ilike '%" + query + "%' ");
+        }
+
+        if (by.contains("title")) {
+            whereQuery.add(" f.name ilike '%" + query + "%' ");
+        }
+
+        if (whereQuery.isEmpty()) {
+            throw new NotFoundException("Неизвестное значение переменной by = " + by);
+        }
+
+        sqlQuery += " left join (\n " +
+                "   SELECT film_id, COUNT(user_id) AS likes FROM film_like\n" +
+                "   Group by film_id\n" +
+                ") l\n" +
+                " ON l.film_id = f.id\n" +
+                "Where" + String.join(" or ", whereQuery)  + "\n" +
+                " order by l.likes Desc ";
+
+        return jdbcTemplate.query(sqlQuery, filmRowMappers::mapRowToFilm);
     }
 }
