@@ -105,7 +105,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
         } else if (Objects.isNull(genreId) && Objects.nonNull(year)) {
             return getPopularFilmsYear(count, year);
 
-        } else if (Objects.nonNull(genreId)){
+        } else if (Objects.nonNull(genreId)) {
             return getPopularFilmsGenre(count, genreId);
         }
 
