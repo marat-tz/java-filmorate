@@ -6,16 +6,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
 
 @Slf4j
 @Component
@@ -24,9 +23,12 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmStorage filmStorage;
 
-    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage) {
+    private final FilmRowMappers filmRowMappers;
+
+    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage, @Lazy FilmRowMappers filmRowMappers) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
+        this.filmRowMappers = filmRowMappers;
     }
 
     @Override
@@ -95,60 +97,77 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms(Long count) {
+    public List<Film> getPopularFilms(Long count, Long genreId, Long year) {
+
+        if (Objects.nonNull(genreId) && Objects.nonNull(year)) {
+            return getPopularFilmsGenreYear(count, genreId, year);
+
+        } else if (Objects.isNull(genreId) && Objects.nonNull(year)) {
+            return getPopularFilmsYear(count, year);
+
+        } else if (Objects.nonNull(genreId)) {
+            return getPopularFilmsGenre(count, genreId);
+        }
+
         log.info("Получение популярных фильмов в количестве {}", count);
 
-        if (count <= 0) {
-            log.error("Число отображаемых фильмов count не может быть меньше, либо равно 0");
-            throw new ValidationException("Число отображаемых фильмов count не может быть меньше, либо равно 0");
-        }
+        final String filmLikesQueryCount = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
+                "FROM films AS f " +
+                "RIGHT OUTER JOIN film_like AS fl ON f.id = fl.film_id " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.film_id) DESC " +
+                "LIMIT ?";
 
-        final String filmLikesQuery = "SELECT film_id, " +
-                "COUNT(film_id) AS likes " +
-                "FROM film_like " +
-                "GROUP BY film_id " +
-                "ORDER BY likes DESC ";
+        return jdbcTemplate.query(filmLikesQueryCount, filmRowMappers::mapRowToFilm, count)
+                .stream().toList();
+    }
 
-        List<Long> filmIds = jdbcTemplate.query(filmLikesQuery, rs -> {
-            List<Long> ids = new ArrayList<>();
-            while (rs.next()) {
-                ids.add(rs.getLong("film_id"));
-            }
-            return ids;
-        });
+    private List<Film> getPopularFilmsGenre(Long count, Long genreId) {
+        log.info("Получение популярных фильмов с фильтрацией по жанру {} в количестве {}", genreId, count);
 
-        List<Film> result = new ArrayList<>();
-        List<Film> allFilms = filmStorage.findAll().stream().toList();
+        final String filmLikesQueryGenres = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
+                "FROM films AS f " +
+                "RIGHT OUTER JOIN film_like AS fl ON f.id = fl.film_id  " +
+                "RIGHT OUTER JOIN film_genre AS fg ON f.id = fg.film_id " +
+                "WHERE fg.genre_id = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.film_id) DESC " +
+                "LIMIT ?";
 
-        allFilms.forEach(film -> {
-            if (Objects.requireNonNull(filmIds).contains(film.getId())) {
-                result.add(film);
-            }
-        });
+        return jdbcTemplate.query(filmLikesQueryGenres, filmRowMappers::mapRowToFilm,
+                    genreId, count).stream().toList();
+    }
 
-        result.sort(new Comparator<Film>() {
-            @Override
-            public int compare(Film f1, Film f2) {
-                Long likes1 = f1.getLikes();
-                Long likes2 = f2.getLikes();
+    private List<Film> getPopularFilmsGenreYear(Long count, Long genreId, Long year) {
+        log.info("Получение популярных фильмов c фильтрацией по жанру {} и году {} в количестве {}",
+                genreId, year, count);
 
-                if (Objects.isNull(likes1)) {
-                    likes1 = 0L;
-                }
+        final String filmLikesQueryGenreYear = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
+                "FROM films AS f " +
+                "RIGHT OUTER JOIN film_like AS fl ON f.id = fl.film_id " +
+                "RIGHT OUTER JOIN film_genre AS fg ON f.id = fg.film_id " +
+                "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM f.releaseDate) = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.film_id) DESC " +
+                "LIMIT ?";
 
-                if (Objects.isNull(likes2)) {
-                    likes2 = 0L;
-                }
+        return jdbcTemplate.query(filmLikesQueryGenreYear, filmRowMappers::mapRowToFilm,
+                    genreId, year, count).stream().toList();
+    }
 
-                return likes1.compareTo(likes2);
-            }
-        });
+    private List<Film> getPopularFilmsYear(Long count, Long year) {
+        log.info("Получение популярных фильмов с фильрацией по году {} в количестве {}", year, count);
 
-        Collections.reverse(result);
-        for (Film f : result) {
-            log.info("Количество лайков фильма " + f.getId() + " равно " + f.getLikes());
-        }
+        final String filmLikesQueryYear = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
+                "FROM films AS f " +
+                "RIGHT OUTER JOIN film_like AS fl ON f.id = fl.film_id " +
+                "WHERE EXTRACT(YEAR FROM f.releaseDate) = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.film_id) DESC " +
+                "LIMIT ?";
 
-        return result;
+        return jdbcTemplate.query(filmLikesQueryYear, filmRowMappers::mapRowToFilm,
+                year, count).stream().toList();
     }
 }
+
