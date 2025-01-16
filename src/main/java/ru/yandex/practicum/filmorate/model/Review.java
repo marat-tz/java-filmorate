@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@Value
 @Builder
 public class Review {
     Long reviewId;
