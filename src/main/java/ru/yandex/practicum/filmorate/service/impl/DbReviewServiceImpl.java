@@ -74,7 +74,7 @@ public class DbReviewServiceImpl implements ReviewService {
 
     public void likeToReview(Long reviewId, Long userId) {
         try {
-            reviewStorage.likeToReview(reviewId, userId);
+            reviewStorage.likeOrDislikeToReview(reviewId, userId, true);
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при добавление лайка у отзыва.");
         }
@@ -82,26 +82,19 @@ public class DbReviewServiceImpl implements ReviewService {
 
     public void dislikeToReview(Long reviewId, Long userId) {
         try {
-            reviewStorage.dislikeToReview(reviewId, userId);
+            reviewStorage.likeOrDislikeToReview(reviewId, userId, false);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при добавление дислайка у отзыва.");
+            throw new RuntimeException("Ошибка при добавлении дизлайка к отзыву.", e);
         }
     }
 
     public void deleteLike(Long reviewId, Long userId) {
-        try {
-            reviewStorage.deleteLike(reviewId, userId);
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при удаление лайка у отзыва.");
-        }
+        reviewStorage.deleteLikeOrDislike(reviewId, userId, true);
     }
 
     public void deleteDislike(Long reviewId, Long userId) {
-        try {
-            reviewStorage.deleteDislike(reviewId, userId);
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при удаление дислайка у отзыва.");
-        }
+        reviewStorage.deleteLikeOrDislike(reviewId, userId, false);
     }
+
 }
 

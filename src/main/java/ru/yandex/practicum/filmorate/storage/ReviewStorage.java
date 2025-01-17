@@ -17,11 +17,7 @@ public interface ReviewStorage {
 
     List<Review> getAllReviews(int count);
 
-    void likeToReview(Long reviewId, Long userId);
+    void likeOrDislikeToReview(Long reviewId, Long userId, boolean isLike);
 
-    void dislikeToReview(Long reviewId, Long userId);
-
-    void deleteLike(Long reviewId, Long userId);
-
-    void deleteDislike(Long reviewId, Long userId);
+    void deleteLikeOrDislike(Long reviewId, Long userId, boolean isLike);
 }

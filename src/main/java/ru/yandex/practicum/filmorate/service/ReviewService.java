@@ -15,9 +15,9 @@ public interface ReviewService {
 
     List<Review> getReviewByFilm(Long filmId, int count);
 
-    void likeToReview(Long id, Long userId);
-
     List<Review> getAllReviews(int count);
+
+    void likeToReview(Long id, Long userId);
 
     void dislikeToReview(Long id, Long userId);
 
