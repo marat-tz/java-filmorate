@@ -65,11 +65,10 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 CREATE TABLE IF NOT EXISTS useful(
     review_id INT NOT NULL,
-    like_id INT,
-    dislike_id INT,
+    is_like BOOLEAN,
+    user_id INT NOT NULL,
     FOREIGN KEY(review_id) REFERENCES reviews(id),
-    FOREIGN KEY(like_id) REFERENCES users(id),
-    FOREIGN KEY(dislike_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS feed (

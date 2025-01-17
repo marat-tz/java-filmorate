@@ -28,7 +28,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             return reviewStorage.addReview(reviews);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при добавлении.", e);
+            throw new RuntimeException("Ошибка при добавлении. " + e.getMessage());
         }
     }
 
@@ -36,7 +36,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             return reviewStorage.updateReview(reviews);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при обновлении.");
+            throw new RuntimeException("Ошибка при обновлении. " + e.getMessage());
         }
     }
 
@@ -44,7 +44,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             reviewStorage.deleteReview(id);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при удалении.");
+            throw new RuntimeException("Ошибка при удалении. " + e.getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             return reviewStorage.getReviewById(id);
         } catch (Exception e) {
-            throw new NotFoundException("Ошибка при получении.");
+            throw new NotFoundException("Ошибка при получении. " + e.getMessage());
         }
     }
 
@@ -60,7 +60,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             return reviewStorage.getReviewByFilm(id, count);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при получении отзывов о фильме.");
+            throw new RuntimeException("Ошибка при получении отзывов о фильме. " + e.getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             return reviewStorage.getAllReviews(count);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при получении всех отзывов.");
+            throw new RuntimeException("Ошибка при получении всех отзывов. " + e.getMessage());
         }
     }
 
@@ -76,7 +76,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             reviewStorage.likeOrDislikeToReview(reviewId, userId, true);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при добавление лайка у отзыва.");
+            throw new RuntimeException("Ошибка при добавлении лайка у отзыва. " + e.getMessage());
         }
     }
 
@@ -84,7 +84,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             reviewStorage.likeOrDislikeToReview(reviewId, userId, false);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при добавлении дизлайка к отзыву.", e);
+            throw new RuntimeException("Ошибка при добавлении дизлайка к отзыву. " + e.getMessage());
         }
     }
 
