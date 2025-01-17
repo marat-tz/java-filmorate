@@ -20,5 +20,4 @@ public class ErrorHandler {
         return new ErrorResponse("Not found exception", e.getMessage());
     }
 
-
 }
