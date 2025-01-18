@@ -39,10 +39,10 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
             throw new ValidationException("Нельзя добавить в друзья самого себя");
         }
 
-        Optional<User> mainUser = userStorage.findById(user1Id);
-        Optional<User> friendUser = userStorage.findById(user2Id);
+        User mainUser = userStorage.findById(user1Id);
+        User friendUser = userStorage.findById(user2Id);
 
-        if (mainUser.isPresent() && friendUser.isPresent()) {
+        if (mainUser != null && friendUser != null) {
 
             String sqlQueryUser2 = "SELECT user2_id " +
                     "FROM friendship WHERE user1_id = ?";
@@ -60,14 +60,14 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
                 });
             }
 
-            mainUser.get().getFriends().add(friendUser.get());
+            mainUser.getFriends().add(friendUser);
 
             feedStorage.create(user1Id, EventType.FRIEND, Operation.ADD, user2Id);
 
             log.info("Пользователь с id = {} добавил в друзья пользователя с id = {}", user1Id, user2Id);
-            return mainUser.get();
+            return mainUser;
 
-        } else if (mainUser.isEmpty()) {
+        } else if (mainUser == null) {
             log.error("Пользователь с id = {} не найден", user1Id);
             throw new NotFoundException("Пользователь с id = " + user1Id + " не найден");
 
@@ -85,10 +85,10 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
             throw new ValidationException("Нельзя удалить из друзей самого себя");
         }
 
-        Optional<User> mainUser = userStorage.findById(mainUserId);
-        Optional<User> friendUser = userStorage.findById(friendUserId);
+        User mainUser = userStorage.findById(mainUserId);
+        User friendUser = userStorage.findById(friendUserId);
 
-        if (mainUser.isPresent() && friendUser.isPresent()) {
+        if (mainUser != null && friendUser != null) {
 
             String sqlDeleteFriend = "DELETE FROM friendship WHERE user1_id = ? AND user2_id = ?";
 
@@ -98,9 +98,9 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
             feedStorage.create(mainUserId, EventType.FRIEND, Operation.REMOVE, friendUserId);
 
             log.info("Пользователь с id = {} удалил из друзей пользователя с id = {}", mainUserId, friendUserId);
-            return mainUser.get();
+            return mainUser;
 
-        } else if (mainUser.isEmpty()) {
+        } else if (mainUser == null) {
             log.error("Пользователь с id = {} не найден", mainUserId);
             throw new NotFoundException("Пользователь с id = " + mainUserId + " не найден");
 
@@ -117,11 +117,11 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
                 "JOIN friendship AS fri2 ON users.id = fri2.user2_id " +
                 "WHERE fri.user1_id = ? AND fri2.user1_id = ? ";
 
-        if (userStorage.findById(firstUserId).isPresent() && userStorage.findById(secondUserId).isPresent()) {
+        if (userStorage.findById(firstUserId) != null && userStorage.findById(secondUserId) != null) {
 
             return jdbcTemplate.query(sqlCommonFriends, userRowMapper::mapRowToUser, firstUserId, secondUserId);
 
-        } else if (userStorage.findById(firstUserId).isEmpty()) {
+        } else if (userStorage.findById(firstUserId) == null) {
             log.error("Пользователь с id = {} не найден", firstUserId);
             throw new NotFoundException("Пользователь с id = " + firstUserId + " не найден");
 

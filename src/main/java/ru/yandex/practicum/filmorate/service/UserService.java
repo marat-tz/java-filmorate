@@ -19,7 +19,7 @@ public interface UserService {
 
     Collection<User> findAll();
 
-    Optional<User> findById(Long id);
+    User findById(Long id);
 
     User addFriend(Long mainUserId, Long friendUserId);
 

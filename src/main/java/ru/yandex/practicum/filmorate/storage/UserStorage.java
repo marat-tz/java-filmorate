@@ -9,7 +9,7 @@ public interface UserStorage {
 
     Collection<User> findAll();
 
-    Optional<User> findById(Long id);
+    User findById(Long id);
 
     User create(User user);
 
