@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -43,11 +44,17 @@ public class FilmDbStorageImpl implements FilmStorage {
     public Film findById(Long id) {
         log.info("Поиск фильма по id = {}", id);
 
+        Optional<Film> resultFilm;
+
         final String sqlQuery = "SELECT id, name, description, releaseDate, duration, mpa_id " +
                 "FROM films WHERE id = ?";
 
-        Optional<Film> resultFilm = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
-                filmRowMappers::mapRowToFilm, id));
+        try {
+            resultFilm = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
+                    filmRowMappers::mapRowToFilm, id));
+        } catch (EmptyResultDataAccessException e) {
+            resultFilm = Optional.empty();
+        }
 
         if (resultFilm.isPresent()) {
             return resultFilm.get();
