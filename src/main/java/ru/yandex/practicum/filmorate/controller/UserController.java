@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -68,6 +70,7 @@ public class UserController {
 
     @GetMapping("/{id}/feed")
     public Collection<Feed> getFeed(@PathVariable Long id) {
+        log.info("GET запрос на получение списка событий пользователя с id {}", id);
         return service.getUserFeed(id);
     }
 }
