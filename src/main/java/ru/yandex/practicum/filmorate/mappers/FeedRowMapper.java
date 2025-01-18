@@ -28,7 +28,7 @@ public class FeedRowMapper {
                 .userId(resultSet.getLong("user_id"))
                 .eventType(checkEvent(event))
                 .operation(checkOperation(operation))
-                .entityId(resultSet.getLong("enity_id"))
+                .entityId(resultSet.getLong("entity_id"))
                 .build();
     }
 
