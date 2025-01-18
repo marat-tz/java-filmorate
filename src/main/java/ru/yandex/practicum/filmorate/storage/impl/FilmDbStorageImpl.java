@@ -11,14 +11,14 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Slf4j
 @Component("filmDbStorage")
@@ -69,6 +69,8 @@ public class FilmDbStorageImpl implements FilmStorage {
 
         // проверяем существование рейтинга в таблице mpa
         mpaStorage.getCountById(film);
+        // проверяем существование жанров
+        genreStorage.getExistGenres(film);
 
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQueryFilm, new String[]{"id"});
@@ -89,8 +91,7 @@ public class FilmDbStorageImpl implements FilmStorage {
         // кладём жанры фильма в таблицу film_genre
         filmGenreStorage.addGenresInFilmGenres(film, filmId);
 
-        List<Genre> resultGenres = genreStorage.getExistGenres(film).stream().toList();
-        directorStorage.addDirectorsByFilm(film);
+        directorStorage.addDirectorsByFilm(film, filmId);
 
         log.info("Фильм c id = {} успешно добавлен", filmId);
         return findById(filmId);
@@ -158,5 +159,37 @@ public class FilmDbStorageImpl implements FilmStorage {
 
         log.info(sqlQuery);
         return jdbcTemplate.query(sqlQuery, filmRowMappers::mapRowToFilm, directorId).stream().toList();
+    }
+
+    @Override
+    public List<Film> getFilmsByDirectorAndOrByTitle(String query, String by) {
+        String sqlQuery = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id FROM films f\n";
+
+        List<String> whereQuery = new ArrayList<>();
+        if (by.contains("director")) {
+            sqlQuery += " left join film_director f_d\n" +
+                    " On f_d.film_id = f.id\n" +
+                    " LEFT JOIN directors d\n" +
+                    " ON f_d.director_id = d.id\n";
+            whereQuery.add(" d.name ilike '%" + query + "%' ");
+        }
+
+        if (by.contains("title")) {
+            whereQuery.add(" f.name ilike '%" + query + "%' ");
+        }
+
+        if (whereQuery.isEmpty()) {
+            throw new NotFoundException("Неизвестное значение переменной by = " + by);
+        }
+
+        sqlQuery += " left join (\n " +
+                "   SELECT film_id, COUNT(user_id) AS likes FROM film_like\n" +
+                "   Group by film_id\n" +
+                ") l\n" +
+                " ON l.film_id = f.id\n" +
+                "Where" + String.join(" or ", whereQuery)  + "\n" +
+                " order by l.likes Desc ";
+
+        return jdbcTemplate.query(sqlQuery, filmRowMappers::mapRowToFilm);
     }
 }
