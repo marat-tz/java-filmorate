@@ -17,14 +17,12 @@ import java.sql.SQLException;
 public class FeedRowMapper {
 
     public Feed mapRowToFeed(ResultSet resultSet, int rowNum) throws SQLException {
-        log.info("Старт метода Film mapRowToFeed(ResultSet resultSet)");
-
         String event = resultSet.getString("event_type").toUpperCase();
         String operation = resultSet.getString("operation").toUpperCase();
 
         return Feed.builder()
                 .eventId(resultSet.getLong("id"))
-                .timestamp(resultSet.getTimestamp("time_stamp"))
+                .timestamp(resultSet.getLong("time_stamp"))
                 .userId(resultSet.getLong("user_id"))
                 .eventType(checkEvent(event))
                 .operation(checkOperation(operation))

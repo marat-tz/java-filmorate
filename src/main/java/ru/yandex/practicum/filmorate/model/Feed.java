@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Builder(toBuilder = true)
 public class Feed {
 
-    Timestamp timestamp;
+    Long timestamp;
 
     Long userId;
 
