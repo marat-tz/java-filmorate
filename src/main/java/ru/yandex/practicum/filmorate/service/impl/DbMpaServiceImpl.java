@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.Collection;
 
-@Slf4j
 @Service
 public class DbMpaServiceImpl implements MpaService {
 

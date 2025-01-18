@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.util.Collection;
 
-@Slf4j
 @Service
 public class DbDirectorServiceImpl implements DirectorService {
     private final DirectorStorage storage;

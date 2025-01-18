@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import java.util.Collection;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class DbGenreServiceImpl implements GenreService {
 
