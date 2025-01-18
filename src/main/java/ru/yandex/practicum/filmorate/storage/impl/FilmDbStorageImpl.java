@@ -11,7 +11,12 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
+
 
 import java.sql.PreparedStatement;
 import java.util.Collection;
@@ -99,7 +104,7 @@ public class FilmDbStorageImpl implements FilmStorage {
 
         // кладём жанры фильма в таблицу film_genre
         filmGenreStorage.addGenresInFilmGenres(film, filmId);
-        
+
         directorStorage.addDirectorsByFilm(film, filmId);
 
         log.info("Фильм c id = {} успешно добавлен", filmId);
@@ -163,7 +168,6 @@ public class FilmDbStorageImpl implements FilmStorage {
             throw new ValidationException("Неизвестная сортировка");
         }
 
-        log.info(sqlQuery);
         return jdbcTemplate.query(sqlQuery, filmRowMappers::mapRowToFilm, directorId).stream().toList();
     }
 
