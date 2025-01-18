@@ -32,7 +32,7 @@ public class DbUserServiceImpl implements UserService {
 
     @Override
     public Collection<User> getFriends(Long userId) {
-        if (findById(userId).isEmpty()) {
+        if (findById(userId) == null) {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
 
@@ -60,7 +60,7 @@ public class DbUserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public User findById(Long id) {
         return storage.findById(id);
     }
 

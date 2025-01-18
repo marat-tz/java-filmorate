@@ -35,7 +35,7 @@ public class UserDbStorageImpl implements UserStorage {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public User findById(Long id) {
         Optional<User> resultUser;
 
         String sqlQuery = "SELECT id, email, login, name, birthday " +
@@ -49,7 +49,7 @@ public class UserDbStorageImpl implements UserStorage {
         }
 
         if (resultUser.isPresent()) {
-            return resultUser;
+            return resultUser.get();
 
         } else {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
