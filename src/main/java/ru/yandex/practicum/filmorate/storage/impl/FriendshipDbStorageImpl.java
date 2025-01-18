@@ -8,6 +8,9 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -26,6 +29,8 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserStorage userStorage;
     private final UserRowMapper userRowMapper;
+
+    private final FeedStorage feedStorage;
 
     @Override
     public User addFriend(Long user1Id, Long user2Id) {
@@ -58,6 +63,8 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
 
             mainUser.get().getFriends().add(friendUser.get());
 
+            feedStorage.create(user1Id, EventType.FRIEND, Operation.ADD, user2Id);
+
             log.info("Пользователь с id = {} добавил в друзья пользователя с id = {}", user1Id, user2Id);
             return mainUser.get();
 
@@ -88,6 +95,8 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
 
             int deletedRows = jdbcTemplate.update(sqlDeleteFriend, mainUserId, friendUserId);
             log.info("Удалено {} строк", deletedRows);
+
+            feedStorage.create(mainUserId, EventType.FRIEND, Operation.REMOVE, friendUserId);
 
             log.info("Пользователь с id = {} удалил из друзей пользователя с id = {}", mainUserId, friendUserId);
             return mainUser.get();
