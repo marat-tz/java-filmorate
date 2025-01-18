@@ -30,19 +30,19 @@ public class DirectorDbStorageImpl implements DirectorStorage {
 
     @Override
     public Collection<Director> findAll() {
-        String sqlQuery = "SELECT id, name from directors";
+        String sqlQuery = "SELECT id, name FROM directors";
         return jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector);
     }
 
     @Override
     public Director getById(Long id) {
-        String sqlQuery = "SELECT id, name from directors" +
-                " where id = ?";
+        String sqlQuery = "SELECT id, name FROM directors " +
+                "WHERE id = ?";
         Director director = jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector, id)
                 .stream().findAny().orElse(null);
 
         if (director == null) {
-            throw new NotFoundException("Режиссера с id = " + id + " не найден");
+            throw new NotFoundException("Режиссер с id = " + id + " не найден");
         }
 
         return director;
@@ -50,7 +50,7 @@ public class DirectorDbStorageImpl implements DirectorStorage {
 
     @Override
     public Director create(Director director) {
-        String sqlQuery = "INSERT INTO directors(name) values (?)";
+        String sqlQuery = "INSERT INTO directors(name) VALUES (?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -69,7 +69,7 @@ public class DirectorDbStorageImpl implements DirectorStorage {
     public Director update(Director director) {
         String sqlQuery = "UPDATE directors" +
                 " SET name = ?" +
-                " where id = ?";
+                " WHERE id = ?";
         int rows = jdbcTemplate.update(sqlQuery, director.getName(), director.getId());
 
         if (rows == 0) {
@@ -81,8 +81,8 @@ public class DirectorDbStorageImpl implements DirectorStorage {
 
     @Override
     public void delete(Long id) {
-        String sqlQuery = "DELETE FROM directors" +
-                " where id = ?";
+        String sqlQuery = "DELETE FROM directors " +
+                "WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
 
@@ -105,8 +105,8 @@ public class DirectorDbStorageImpl implements DirectorStorage {
 
     @Override
     public void deleteDirectorsByFilm(Film film) {
-        String sqlQuery = "DELETE FROM film_director" +
-                " where film_id = ?";
+        String sqlQuery = "DELETE FROM film_director " +
+                "WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
     }
 
@@ -119,7 +119,7 @@ public class DirectorDbStorageImpl implements DirectorStorage {
     public void addDirectorsByFilm(Film film, long filmId) {
         if (film.getDirectors() != null) {
 
-            String sqlQuery = "INSERT INTO film_director(film_id, director_id) values (?, ?)";
+            String sqlQuery = "INSERT INTO film_director(film_id, director_id) VALUES (?, ?)";
 
             jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
                 @Override
