@@ -15,8 +15,6 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
 
 import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
