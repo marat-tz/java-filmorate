@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -24,16 +23,14 @@ import java.util.Objects;
 public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final FilmStorage filmStorage;
 
     private final FeedStorage feedStorage;
 
     private final FilmRowMappers filmRowMappers;
 
-    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage,
-                                 @Lazy FilmRowMappers filmRowMappers, @Lazy FeedStorage feedStorage) {
+    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmRowMappers filmRowMappers,
+                                 @Lazy FeedStorage feedStorage) {
         this.jdbcTemplate = jdbcTemplate;
-        this.filmStorage = filmStorage;
         this.filmRowMappers = filmRowMappers;
         this.feedStorage = feedStorage;
     }
