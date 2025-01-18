@@ -39,6 +39,7 @@ public class FeedDbStorageImpl implements FeedStorage {
 
     @Override
     public Feed findById(Long id) {
+        log.info("Поиск события по id {}", id);
         Optional<Feed> resultFeed;
 
         String sqlQuery = "SELECT id, entity_id, user_id, time_stamp, event_type, operation " +
@@ -55,13 +56,14 @@ public class FeedDbStorageImpl implements FeedStorage {
             return resultFeed.get();
 
         } else {
+            log.error("Событие с id {} не найдено", id);
             throw new NotFoundException("Событие с id = " + id + " не найдено");
         }
     }
 
     @Override
     public Feed create(Long userId, EventType event, Operation operation, Long entityId) {
-        log.info("Создание нового события");
+        log.info("Создание нового события, user_id = {}", userId);
         final long feedId;
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -90,6 +92,7 @@ public class FeedDbStorageImpl implements FeedStorage {
         if (Objects.nonNull(keyHolder.getKey())) {
             feedId = keyHolder.getKey().longValue();
         } else {
+            log.error("Ошибка добавления пользователя {} в таблицу", userId);
             throw new NotFoundException("Ошибка добавления пользователя в таблицу");
         }
 
@@ -99,6 +102,7 @@ public class FeedDbStorageImpl implements FeedStorage {
 
     @Override
     public Collection<Feed> getUserFeed(Long id) {
+        log.info("Получаем события для пользователя с id {}", id);
 
         String sqlQuery = "SELECT id, entity_id, user_id, time_stamp, event_type, operation " +
                 "FROM feed where user_id = ?";
