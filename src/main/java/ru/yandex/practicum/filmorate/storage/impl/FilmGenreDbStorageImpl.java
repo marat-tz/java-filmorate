@@ -40,7 +40,6 @@ public class FilmGenreDbStorageImpl implements FilmGenreStorage {
 
     @Override
     public void addGenresInFilmGenres(Film film, Long newId) {
-
         List<Genre> resultGenres = genreStorage.getExistGenres(film).stream().toList();
 
         final String sqlQueryFilmGenres = "INSERT INTO film_genre(film_id, genre_id) " +
