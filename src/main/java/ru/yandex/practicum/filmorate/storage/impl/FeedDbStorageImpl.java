@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,13 +64,14 @@ public class FeedDbStorageImpl implements FeedStorage {
 
     @Override
     public Feed create(Long userId, EventType event, Operation operation, Long entityId) {
-        log.info("Создание нового события, user_id = {}", userId);
+        log.info("Создание события. Пользователь user_id = {} выполнил действие {} {} сущности entity_id = {}",
+                userId, event, operation, entityId);
         final long feedId;
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         Feed feed = Feed
                 .builder()
-                .timestamp(Timestamp.from(Instant.now()))
+                .timestamp(System.currentTimeMillis())
                 .userId(userId)
                 .eventType(event)
                 .operation(operation)
@@ -83,7 +85,7 @@ public class FeedDbStorageImpl implements FeedStorage {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
             stmt.setLong(1, feed.getEntityId());
             stmt.setLong(2, feed.getUserId());
-            stmt.setTimestamp(3, feed.getTimestamp());
+            stmt.setLong(3, feed.getTimestamp());
             stmt.setString(4, feed.getEventType().toString());
             stmt.setString(5, feed.getOperation().toString());
             return stmt;
@@ -104,9 +106,20 @@ public class FeedDbStorageImpl implements FeedStorage {
     public Collection<Feed> getUserFeed(Long id) {
         log.info("Получаем события для пользователя с id {}", id);
 
-        String sqlQuery = "SELECT id, entity_id, user_id, time_stamp, event_type, operation " +
-                "FROM feed where user_id = ?";
+        // запрос на события друзей
+        String sqlQueryFriends = "SELECT fe.id, fe.entity_id, fe.user_id, fe.time_stamp, fe.event_type, fe.operation " +
+                "FROM feed fe " +
+                "LEFT JOIN friendship fr ON fr.user2_id = fe.user_id " +
+                "WHERE fr.user1_id = ? OR fe.user_id = ?";
 
-        return jdbcTemplate.query(sqlQuery, feedRowMapper::mapRowToFeed, id).stream().toList();
+        // запрос на свои события
+        String sqlQuery = "SELECT * " +
+                "FROM feed " +
+                "WHERE user_id = ?";
+
+        List<Feed> result = jdbcTemplate.query(sqlQueryFriends, feedRowMapper::mapRowToFeed, id, id).stream().toList();
+
+        log.info("Возвращение списка Feed в методе getUserFeed {}", result);
+        return result;
     }
 }

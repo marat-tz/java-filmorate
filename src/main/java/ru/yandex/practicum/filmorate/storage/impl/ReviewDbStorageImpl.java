@@ -7,8 +7,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.ReviewRowMapper;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.sql.PreparedStatement;
@@ -24,10 +28,14 @@ public class ReviewDbStorageImpl implements ReviewStorage {
     private final JdbcTemplate jdbc;
     private final ReviewRowMapper reviewMapper;
 
+    private final FeedStorage feedStorage;
+
     @Override
     public Review addReview(Review reviews) {
+        Long reviewId;
         final String ADD_REVIEW_QUERY = "INSERT INTO reviews (content, is_positive, user_id, film_id) " +
                 "VALUES (?, ?, ?, ?)";
+
         KeyHolder key = new GeneratedKeyHolder();
         jdbc.update(m -> {
             PreparedStatement ps = m.prepareStatement(ADD_REVIEW_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -37,7 +45,15 @@ public class ReviewDbStorageImpl implements ReviewStorage {
             ps.setLong(4, reviews.getFilmId());
             return ps;
         }, key);
-        return getReviewById(Objects.requireNonNull(key.getKey()).longValue());
+
+        if (Objects.nonNull(key.getKey())) {
+            reviewId = key.getKey().longValue();
+        } else {
+            throw new ValidationException("Ошибка присвоения id отзыву");
+        }
+
+        feedStorage.create(reviews.getUserId(), EventType.REVIEW, Operation.ADD, reviewId);
+        return getReviewById(Objects.requireNonNull(reviewId));
     }
 
     @Override
@@ -54,16 +70,21 @@ public class ReviewDbStorageImpl implements ReviewStorage {
             log.info("Не удалось обновить отзыв с id {}.", reviews.getReviewId());
             throw new NotFoundException("Отзыв с таким id не найден.");
         }
+        feedStorage.create(reviews.getUserId(), EventType.REVIEW, Operation.UPDATE, reviews.getReviewId());
         return getReviewById(reviews.getReviewId());
     }
 
     @Override
     public void deleteReview(Long id) {
+        Review review = getReviewById(id);
+
         final String DELETE_USEFUL_QUERY = "DELETE FROM useful WHERE review_id = ?";
         jdbc.update(DELETE_USEFUL_QUERY, id);
 
         final String DELETE_REVIEW_QUERY = "DELETE FROM reviews WHERE id = ?";
         jdbc.update(DELETE_REVIEW_QUERY, id);
+
+        feedStorage.create(review.getUserId(), EventType.REVIEW, Operation.REMOVE, id);
     }
 
     @Override
