@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FeedRowMapper;
 import ru.yandex.practicum.filmorate.model.Feed;
@@ -21,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
+@Component("feedDbStorage")
 @RequiredArgsConstructor
 public class FeedDbStorageImpl implements FeedStorage {
 

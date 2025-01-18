@@ -29,7 +29,6 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserStorage userStorage;
     private final UserRowMapper userRowMapper;
-
     private final FeedStorage feedStorage;
 
     @Override
