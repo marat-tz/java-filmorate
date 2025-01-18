@@ -110,11 +110,6 @@ public class FeedDbStorageImpl implements FeedStorage {
                 "LEFT JOIN friendship fr ON fr.user2_id = fe.user_id " +
                 "WHERE fr.user1_id = ? OR fe.user_id = ?";
 
-        // запрос на свои события
-        String sqlQuery = "SELECT * " +
-                "FROM feed " +
-                "WHERE user_id = ?";
-
         List<Feed> result = jdbcTemplate.query(sqlQueryFriends, feedRowMapper::mapRowToFeed, id, id).stream().toList();
 
         log.info("Возвращение списка Feed в методе getUserFeed {}", result);

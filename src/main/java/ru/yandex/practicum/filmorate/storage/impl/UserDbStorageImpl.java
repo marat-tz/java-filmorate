@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -104,9 +103,6 @@ public class UserDbStorageImpl implements UserStorage {
         final long userId;
 
         log.info("Обновление данных пользователя с id = {}", newUser.getId());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
 
         String sqlQuery = "UPDATE users SET " +
                     "email = ?, login = ?, name = ?, birthday = ? " +
