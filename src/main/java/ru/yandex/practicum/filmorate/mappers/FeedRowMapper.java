@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class FeedRowMapper {
