@@ -68,6 +68,6 @@ public class UserController {
 
     @GetMapping("/{id}/feed")
     public Collection<Feed> getFeed(@PathVariable Long id) {
-        return service.getFeed(id);
+        return service.getUserFeed(id);
     }
 }
