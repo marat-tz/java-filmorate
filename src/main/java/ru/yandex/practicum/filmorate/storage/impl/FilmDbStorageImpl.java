@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,11 +14,11 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.sql.PreparedStatement;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.Collection;
 
 @Slf4j
 @Component("filmDbStorage")
@@ -67,8 +66,7 @@ public class FilmDbStorageImpl implements FilmStorage {
     @Override
     public Film create(Film film) {
         log.info("Добавление нового фильма: {}", film.getName());
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
         final long filmId;
 
         final String sqlQueryFilm = "INSERT INTO films(name, description, releaseDate, duration, mpa_id) " +
@@ -85,7 +83,11 @@ public class FilmDbStorageImpl implements FilmStorage {
             stmt.setString(2, film.getDescription());
             stmt.setString(3, film.getReleaseDate().toString());
             stmt.setInt(4, film.getDuration());
-            stmt.setLong(5, film.getMpa().getId());
+            if (mpaStorage.getCountById(film) != 0) {
+                stmt.setLong(5, film.getMpa().getId());
+            } else {
+                stmt.setNull(5, 0);
+            }
             return stmt;
         }, keyHolder);
 
@@ -97,7 +99,7 @@ public class FilmDbStorageImpl implements FilmStorage {
 
         // кладём жанры фильма в таблицу film_genre
         filmGenreStorage.addGenresInFilmGenres(film, filmId);
-
+        
         directorStorage.addDirectorsByFilm(film, filmId);
 
         log.info("Фильм c id = {} успешно добавлен", filmId);
@@ -110,9 +112,6 @@ public class FilmDbStorageImpl implements FilmStorage {
         final long filmId;
 
         log.info("Обновление данных фильма с id = {}", newFilm.getId());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
 
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, releaseDate = ?, duration = ? " +

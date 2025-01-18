@@ -3,11 +3,14 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,9 +22,13 @@ public class DbFilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final FilmLikeStorage filmLikeStorage;
 
-    public DbFilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage, FilmLikeStorage filmLikeStorage) {
+    private final UserStorage userStorage;
+
+    public DbFilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage, FilmLikeStorage filmLikeStorage,
+                             UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.filmLikeStorage = filmLikeStorage;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -46,11 +53,29 @@ public class DbFilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(long filmId, long userId) {
+
+        if (filmStorage.findById(filmId) == null) {
+            throw new NotFoundException("Фильм с id " + filmId + " не существует");
+        }
+
+        if (userStorage.findById(userId) == null) {
+            throw new NotFoundException("Пользователь с id " + filmId + " не существует");
+        }
+
         filmLikeStorage.addLike(filmId, userId);
     }
 
     @Override
     public void removeLike(long filmId, long userId) {
+
+        if (filmStorage.findById(filmId) == null) {
+            throw new NotFoundException("Фильм с id " + filmId + " не существует");
+        }
+
+        if (userStorage.findById(userId) == null) {
+            throw new NotFoundException("Пользователь с id " + filmId + " не существует");
+        }
+
         filmLikeStorage.removeLike(filmId, userId);
     }
 
