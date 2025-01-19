@@ -49,7 +49,8 @@ public class MpaDbStorageImpl implements MpaStorage {
 
     @Override
     public Integer getCountById(Film film) {
-        log.info("Проверка существования mpa_id = {} в таблице mpa", film.getMpa().getId());
+        log.info("Проверка существования mpa_id в таблице mpa");
+
         Integer count;
         final String sqlQueryMpa = "SELECT COUNT(*) " +
                 "FROM mpa WHERE id = ?";

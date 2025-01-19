@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -35,7 +34,7 @@ public class UserDbStorageImpl implements UserStorage {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public User findById(Long id) {
         Optional<User> resultUser;
 
         String sqlQuery = "SELECT id, email, login, name, birthday " +
@@ -49,7 +48,7 @@ public class UserDbStorageImpl implements UserStorage {
         }
 
         if (resultUser.isPresent()) {
-            return resultUser;
+            return resultUser.get();
 
         } else {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
@@ -104,9 +103,6 @@ public class UserDbStorageImpl implements UserStorage {
         final long userId;
 
         log.info("Обновление данных пользователя с id = {}", newUser.getId());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
 
         String sqlQuery = "UPDATE users SET " +
                     "email = ?, login = ?, name = ?, birthday = ? " +

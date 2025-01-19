@@ -31,42 +31,62 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        return service.findAll();
+        log.info("Получен GET запрос /films");
+        Collection<Film> result = service.findAll();
+        log.info("Отправлен GET ответ {}", result);
+        return result;
     }
 
     @GetMapping("/{id}")
     public Film findById(@PathVariable Long id) {
-        return service.findById(id);
+        log.info("Получен GET запрос /films/{id}");
+        Film result = service.findById(id);
+        log.info("Отправлен GET ответ {}", result);
+        return result;
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        return service.create(film);
+        log.info("Получен POST запрос /films");
+        Film result = service.create(film);
+        log.info("Отправлен POST ответ {}", result);
+        return result;
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        return service.update(newFilm);
+        log.info("Получен PUT запрос /films");
+        Film result = service.update(newFilm);
+        log.info("Отправлен PUT ответ {}", result);
+        return result;
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен PUT запрос /films/{}/like/{}", id, userId);
         service.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен DELETE запрос /films/{}/like/{}", id, userId);
         service.removeLike(id, userId);
     }
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count, Long genreId, Long year) {
-        return service.getPopularFilms(count, genreId, year);
+        log.info("Получен GET запрос /films/popular?count={}&genreId={}&year={}", count, genreId, year);
+        List<Film> result = service.getPopularFilms(count, genreId, year);
+        log.info("Отправлен GET ответ {}", result);
+        return result;
     }
 
     @GetMapping("director/{id}")
     public List<Film> getFilmsByDirector(@PathVariable Long id, @RequestParam String sortBy) {
-        return service.getFilmsByDirector(id, sortBy);
+        log.info("Получен GET запрос /films/director/{}", id);
+        List<Film> result = service.getFilmsByDirector(id, sortBy);
+        log.info("Отправлен GET ответ {}", result);
+        return result;
     }
 
     @GetMapping("/search")

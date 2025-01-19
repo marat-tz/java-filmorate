@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
@@ -8,7 +7,6 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.util.Collection;
 
-@Slf4j
 @Service
 public class DbDirectorServiceImpl implements DirectorService {
     private final DirectorStorage storage;

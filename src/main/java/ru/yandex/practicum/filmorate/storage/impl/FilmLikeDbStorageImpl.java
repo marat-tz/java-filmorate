@@ -8,8 +8,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -21,14 +23,16 @@ import java.util.Objects;
 public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final FilmStorage filmStorage;
+
+    private final FeedStorage feedStorage;
 
     private final FilmRowMappers filmRowMappers;
 
-    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmStorage filmStorage, @Lazy FilmRowMappers filmRowMappers) {
+    public FilmLikeDbStorageImpl(JdbcTemplate jdbcTemplate, @Lazy FilmRowMappers filmRowMappers,
+                                 @Lazy FeedStorage feedStorage) {
         this.jdbcTemplate = jdbcTemplate;
-        this.filmStorage = filmStorage;
         this.filmRowMappers = filmRowMappers;
+        this.feedStorage = feedStorage;
     }
 
     @Override
@@ -59,6 +63,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
                 });
 
                 if (rows > 0) {
+                    feedStorage.create(userId, EventType.LIKE, Operation.ADD, filmId);
                     log.info("Пользователь с id = {} поставил лайк фильму с id = {}", userId, filmId);
                 } else {
                     log.error("Ошибка при попытке поставить лайк фильму с id = {}", filmId);
@@ -88,6 +93,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
             int rows = jdbcTemplate.update(filmLikeRemoveQuery, userId, filmId);
 
             if (rows > 0) {
+                feedStorage.create(userId, EventType.LIKE, Operation.REMOVE, filmId);
                 log.info("Пользователь с id = {} удалил свой лайк фильму с id = {}", userId, filmId);
             } else {
                 log.error("Ошибка во время удаления лайка фильму {}", filmId);
