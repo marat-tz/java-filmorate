@@ -11,6 +11,8 @@ public interface FilmService {
 
     Film update(Film film);
 
+    void delete(Long id);
+
     Collection<Film> findAll();
 
     Film findById(Long id);

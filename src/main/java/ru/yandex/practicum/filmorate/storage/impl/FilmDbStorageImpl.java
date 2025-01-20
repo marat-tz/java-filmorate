@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -11,19 +12,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.DirectorStorage;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ArrayList;
+import java.util.*;
 
 @Slf4j
 @Component("filmDbStorage")
@@ -146,6 +138,19 @@ public class FilmDbStorageImpl implements FilmStorage {
         } else {
             log.error("Ошибка обновления фильма id = {}", filmId);
             throw new NotFoundException("Ошибка обновления фильма id = " + filmId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        try {
+            String sql = "DELETE FROM films WHERE id = ?";
+            jdbcTemplate.update(sql, id);
+            log.info("Фильм с id {} был успешно удален", id);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении фильма с id {}: {}", id, e.getMessage());
+            throw e;
         }
     }
 

@@ -41,6 +41,11 @@ public class DbFilmServiceImpl implements FilmService {
     }
 
     @Override
+    public void delete(Long id) {
+        filmStorage.delete(id);
+    }
+
+    @Override
     public Collection<Film> findAll() {
         return filmStorage.findAll();
     }
