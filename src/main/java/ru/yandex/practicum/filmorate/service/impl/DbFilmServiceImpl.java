@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -20,14 +21,15 @@ public class DbFilmServiceImpl implements FilmService {
 
     private final FilmStorage filmStorage;
     private final FilmLikeStorage filmLikeStorage;
-
     private final UserStorage userStorage;
+    private final DirectorStorage directorStorage;
 
     public DbFilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage, FilmLikeStorage filmLikeStorage,
-                             UserStorage userStorage) {
+                             UserStorage userStorage, DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.filmLikeStorage = filmLikeStorage;
         this.userStorage = userStorage;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -97,6 +99,7 @@ public class DbFilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        directorStorage.getById(directorId);
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 

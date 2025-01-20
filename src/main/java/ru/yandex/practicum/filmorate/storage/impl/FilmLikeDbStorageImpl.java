@@ -225,5 +225,6 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
         return jdbcTemplate.query(query, filmRowMappers::mapRowToFilm, userId, userId, userId).stream().toList();
     }
+
 }
 

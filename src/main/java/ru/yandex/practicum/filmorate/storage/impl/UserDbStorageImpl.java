@@ -67,7 +67,7 @@ public class UserDbStorageImpl implements UserStorage {
         String sqlQuery = "INSERT INTO users(email, login, name, birthday) " +
                 "values (?, ?, ?, ?)";
 
-        if (Objects.isNull(user.getName())) {
+        if (user.getName().isBlank()) {
             finalUser = mapper.toUserIfNoName(user);
         } else {
             finalUser = mapper.toUser(user);

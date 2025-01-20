@@ -111,7 +111,7 @@ public class FilmDbStorageImpl implements FilmStorage {
         log.info("Обновление данных фильма с id = {}", newFilm.getId());
 
         String sqlQuery = "UPDATE films SET " +
-                "name = ?, description = ?, releaseDate = ?, duration = ? " +
+                "name = ?, description = ?, releaseDate = ?, duration = ?, mpa_id = ? " +
                 "where id = ?";
 
         int rows = jdbcTemplate.update(connection -> {
@@ -120,7 +120,12 @@ public class FilmDbStorageImpl implements FilmStorage {
             stmt.setString(2, newFilm.getDescription());
             stmt.setString(3, newFilm.getReleaseDate().toString());
             stmt.setInt(4, newFilm.getDuration());
-            stmt.setLong(5, newFilm.getId());
+            if (mpaStorage.getCountById(newFilm) != 0) {
+                stmt.setLong(5, newFilm.getMpa().getId());
+            } else {
+                stmt.setNull(5, 0);
+            }
+            stmt.setLong(6, newFilm.getId());
             return stmt;
         }, keyHolder);
 
@@ -130,9 +135,11 @@ public class FilmDbStorageImpl implements FilmStorage {
             throw new NotFoundException("Ошибка обновления фильма");
         }
 
+
         if (rows > 0) {
-            log.info("Фильм с id = {} успешно обновлён", filmId);
+            filmGenreStorage.addGenresInFilmGenres(newFilm, filmId);
             directorStorage.updateDirectorsByFilm(newFilm);
+            log.info("Фильм с id = {} успешно обновлён", filmId);
             return findById(filmId);
 
         } else {

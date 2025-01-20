@@ -94,6 +94,8 @@ public class DirectorDbStorageImpl implements DirectorStorage {
                 "    ON f_d.director_id = d.id " +
                 "WHERE film_id = ? " +
                 "ORDER BY d.id ";
+
+
         return jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector, filmId).stream().toList();
     }
 
