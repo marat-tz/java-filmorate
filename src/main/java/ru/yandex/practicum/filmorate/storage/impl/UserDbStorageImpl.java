@@ -147,45 +147,12 @@ public class UserDbStorageImpl implements UserStorage {
     @Transactional
     public void delete(Long id) {
         try {
-            deleteFriendships(id);
-            deleteLikes(id);
-            deleteReviews(id);
-            deleteUseful(id);
-            deleteUser(id);
+            String sql = "DELETE FROM users WHERE id = ?";
+            jdbcTemplate.update(sql, id);
             log.info("Пользователь с id = {} был успешно удален.", id);
         } catch (Exception e) {
             log.error("Ошибка при удалении пользователя с id = {}: {}", id, e.getMessage());
             throw e;
         }
-    }
-
-    @Override
-    public void deleteFriendships(Long id) {
-        String sql = "DELETE FROM friendship WHERE user1_id = ? OR user2_id = ?";
-        jdbcTemplate.update(sql, id, id);
-    }
-
-    @Override
-    public void deleteLikes(Long id) {
-        String sql = "DELETE FROM film_like WHERE user_id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void deleteReviews(Long id) {
-        String sql = "DELETE FROM reviews WHERE user_id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void deleteUseful(Long id) {
-        String sql = "DELETE FROM useful WHERE review_id = ? AND user_id = ?";
-        jdbcTemplate.update(sql, id, id);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        String sql = "DELETE FROM users WHERE id = ?";
-        jdbcTemplate.update(sql, id);
     }
 }

@@ -145,46 +145,13 @@ public class FilmDbStorageImpl implements FilmStorage {
     @Transactional
     public void delete(Long id) {
         try {
-            deleteFilmGenres(id);
-            deleteFilmLikes(id);
-            deleteFilmReviews(id);
-            deleteFilmUseful(id);
-            deleteFilm(id);
+            String sql = "DELETE FROM films WHERE id = ?";
+            jdbcTemplate.update(sql, id);
             log.info("Фильм с id {} был успешно удален", id);
         } catch (Exception e) {
             log.error("Ошибка при удалении фильма с id {}: {}", id, e.getMessage());
             throw e;
         }
-    }
-
-    @Override
-    public void deleteFilmGenres(Long id) {
-        String sql = "DELETE FROM film_genre WHERE film_id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void deleteFilmLikes(Long id) {
-        String sql = "DELETE FROM film_like WHERE film_id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void deleteFilmReviews(Long id) {
-        String sql = "DELETE FROM reviews WHERE id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void deleteFilmUseful(Long id) {
-        String sql = "DELETE FROM useful WHERE review_id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void deleteFilm(Long id) {
-        String sql = "DELETE FROM films WHERE id = ?";
-        jdbcTemplate.update(sql, id);
     }
 
     @Override

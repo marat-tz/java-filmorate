@@ -15,14 +15,4 @@ public interface UserStorage {
     User update(User newUser);
 
     void delete(Long id);
-
-    void deleteFriendships(Long id);
-
-    void deleteLikes(Long id);
-
-    void deleteReviews(Long id);
-
-    void deleteUseful(Long id);
-
-    void deleteUser(Long id);
 }
