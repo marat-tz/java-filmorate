@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 
 import java.util.Collection;
 
@@ -81,6 +80,7 @@ public class DbUserServiceImpl implements UserService {
 
     @Override
     public Collection<Feed> getUserFeed(Long id) {
+        findById(id);
         return feedStorage.getUserFeed(id);
     }
 

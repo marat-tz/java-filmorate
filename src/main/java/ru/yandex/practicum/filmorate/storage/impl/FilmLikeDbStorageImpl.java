@@ -46,40 +46,27 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     public void addLike(long filmId, long userId) {
         log.info("Попытка пользователя {} добавить лайк фильму {}", userId, filmId);
 
-        String filmQuery = "SELECT COUNT(*) FROM films WHERE id = ?";
-        Long filmCount = jdbcTemplate.queryForObject(filmQuery, Long.class, filmId);
+        String filmQuery = "SELECT COUNT(*) FROM film_like WHERE user_id = ? and film_id = ?";
+        Long filmCount = jdbcTemplate.queryForObject(filmQuery, Long.class, userId, filmId);
 
-        String userQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
-        Long userCount = jdbcTemplate.queryForObject(userQuery, Long.class, userId);
+        if (filmCount == 0) {
 
-        if (Objects.nonNull(filmCount) && filmCount > 0) {
-            if (Objects.nonNull(userCount) && userCount > 0) {
+             String filmLikeQuery = "INSERT INTO film_like(user_id, film_id) values (?, ?)";
 
-                String filmLikeQuery = "INSERT INTO film_like(user_id, film_id) values (?, ?)";
+             int rows = jdbcTemplate.update(connection -> {
+                 PreparedStatement stmt = connection.prepareStatement(filmLikeQuery);
+                 stmt.setLong(1, userId);
+                 stmt.setLong(2, filmId);
+                 return stmt;
+             });
 
-                int rows = jdbcTemplate.update(connection -> {
-                    PreparedStatement stmt = connection.prepareStatement(filmLikeQuery);
-                    stmt.setLong(1, userId);
-                    stmt.setLong(2, filmId);
-                    return stmt;
-                });
-
-                if (rows > 0) {
-                    feedStorage.create(userId, EventType.LIKE, Operation.ADD, filmId);
-                    log.info("Пользователь с id = {} поставил лайк фильму с id = {}", userId, filmId);
-                } else {
-                    log.error("Ошибка при попытке поставить лайк фильму с id = {}", filmId);
-                    throw new ValidationException("Ошибка при попытке поставить лайк фильму с id = " + filmId);
-                }
-
-            } else {
-                log.error("Пользователь с id = {} не найден", userId);
-                throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-            }
-
-        } else {
-            log.error("Фильм с id = {} не найден", filmId);
-            throw new NotFoundException("Фильм с id = " + filmId + " не найден");
+             if (rows > 0) {
+                 feedStorage.create(userId, EventType.LIKE, Operation.ADD, filmId);
+                 log.info("Пользователь с id = {} поставил лайк фильму с id = {}", userId, filmId);
+             } else {
+                 log.error("Ошибка при попытке поставить лайк фильму с id = {}", filmId);
+                 throw new ValidationException("Ошибка при попытке поставить лайк фильму с id = " + filmId);
+             }
         }
     }
 

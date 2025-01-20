@@ -1,13 +1,16 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class DbReviewServiceImpl implements ReviewService {
     private final ReviewStorage reviewStorage;
@@ -23,6 +26,9 @@ public class DbReviewServiceImpl implements ReviewService {
         if (reviews.getFilmId() == null || reviews.getFilmId() <= 0) {
             throw new NotFoundException("Фильм не найден.");
         }
+        if (reviews.getIsPositive() == null) {
+            throw new ValidationException("IsPositive is null");
+        }
         try {
             return reviewStorage.addReview(reviews);
         } catch (Exception e) {
@@ -31,6 +37,15 @@ public class DbReviewServiceImpl implements ReviewService {
     }
 
     public Review updateReview(Review reviews) {
+        if (reviews.getUserId() == null || reviews.getUserId() <= 0) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        if (reviews.getFilmId() == null || reviews.getFilmId() <= 0) {
+            throw new NotFoundException("Фильм не найден.");
+        }
+        if (reviews.getIsPositive() == null) {
+            throw new ValidationException("IsPositive is null");
+        }
         try {
             return reviewStorage.updateReview(reviews);
         } catch (Exception e) {

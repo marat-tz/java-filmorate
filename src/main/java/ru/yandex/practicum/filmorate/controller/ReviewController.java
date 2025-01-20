@@ -51,7 +51,7 @@ public class ReviewController {
     @GetMapping
     public List<Review> getReviewByFilm(@RequestParam(required = false) Long filmId,
                                         @RequestParam(defaultValue = "10") int count) {
-        log.info("Пришел GET запрос с телом {}", filmId);
+        log.info("Пришел GET запрос с телом {} {}", filmId, count);
         if (filmId != null) {
             List<Review> review = reviewService.getReviewByFilm(filmId, count);
             log.info("Отправлен GET ответ с телом {}", review);
