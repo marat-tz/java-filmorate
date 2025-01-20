@@ -43,6 +43,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
     @Override
     public void addLike(long filmId, long userId) {
+        log.info("Попытка пользователя {} добавить лайк фильму {}", userId, filmId);
 
         String filmQuery = "SELECT COUNT(*) FROM films WHERE id = ?";
         Long filmCount = jdbcTemplate.queryForObject(filmQuery, Long.class, filmId);
@@ -119,7 +120,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
         final String filmLikesQueryCount = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
                 "FROM films AS f " +
-                "RIGHT OUTER JOIN film_like AS fl ON f.id = fl.film_id " +
+                "LEFT OUTER JOIN film_like AS fl ON f.id = fl.film_id " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(fl.film_id) DESC " +
                 "LIMIT ?";
