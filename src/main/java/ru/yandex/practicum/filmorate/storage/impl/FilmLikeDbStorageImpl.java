@@ -176,5 +176,24 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
         return jdbcTemplate.query(filmLikesQueryYear, filmRowMappers::mapRowToFilm,
                 year, count).stream().toList();
     }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        log.info("Получение списка общих фильмов, лайкнутых пользователями с ID {} и {}", userId, friendId);
+
+        final String filmCommonLikes = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id " +
+                "FROM films f " +
+                "INNER JOIN (SELECT user1.film_id " +
+                "    FROM (SELECT film_id FROM film_like WHERE user_id = ?) user1 " +
+                "        INNER JOIN (SELECT film_id FROM film_like WHERE user_id = ?) user2 " +
+                "        on user1.film_id = user2.film_id) l " +
+                "ON l.film_id = f.id " +
+                "LEFT JOIN (SELECT film_id, COUNT(user_id) AS count_like FROM film_like GROUP BY film_id) likes " +
+                "ON f.id = likes.film_id " +
+                "ORDER BY count_like DESC";
+
+        return jdbcTemplate.query(filmCommonLikes, filmRowMappers::mapRowToFilm, userId,
+                friendId).stream().toList();
+    }
 }
 
