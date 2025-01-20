@@ -104,4 +104,9 @@ public class DbFilmServiceImpl implements FilmService {
     public List<Film> getFilmsByDirectorAndOrByTitle(String query, String by) {
         return filmStorage.getFilmsByDirectorAndOrByTitle(query, by);
     }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmLikeStorage.getCommonFilms(userId, friendId);
+    }
 }
