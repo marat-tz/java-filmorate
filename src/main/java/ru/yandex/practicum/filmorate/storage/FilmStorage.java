@@ -15,8 +15,19 @@ public interface FilmStorage {
 
     Film update(Film newFilm);
 
+    void delete(Long id);
+
     List<Film> getFilmsByDirector(Long directorId, String sortBy);
 
     List<Film> getFilmsByDirectorAndOrByTitle(String query, String by);
 
+    void deleteFilmGenres(Long id);
+
+    void deleteFilmLikes(Long id);
+
+    void deleteFilmReviews(Long id);
+
+    void deleteFilmUseful(Long id);
+
+    void deleteFilm(Long id);
 }

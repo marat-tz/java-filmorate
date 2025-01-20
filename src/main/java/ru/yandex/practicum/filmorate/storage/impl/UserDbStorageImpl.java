@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -105,8 +106,8 @@ public class UserDbStorageImpl implements UserStorage {
         log.info("Обновление данных пользователя с id = {}", newUser.getId());
 
         String sqlQuery = "UPDATE users SET " +
-                    "email = ?, login = ?, name = ?, birthday = ? " +
-                    "where id = ?";
+                "email = ?, login = ?, name = ?, birthday = ? " +
+                "where id = ?";
 
         int rows = jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
@@ -140,5 +141,51 @@ public class UserDbStorageImpl implements UserStorage {
             log.error("Пользователь с id = {} не найден", userId);
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        try {
+            deleteFriendships(id);
+            deleteLikes(id);
+            deleteReviews(id);
+            deleteUseful(id);
+            deleteUser(id);
+            log.info("Пользователь с id = {} был успешно удален.", id);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении пользователя с id = {}: {}", id, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void deleteFriendships(Long id) {
+        String sql = "DELETE FROM friendship WHERE user1_id = ? OR user2_id = ?";
+        jdbcTemplate.update(sql, id, id);
+    }
+
+    @Override
+    public void deleteLikes(Long id) {
+        String sql = "DELETE FROM film_like WHERE user_id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteReviews(Long id) {
+        String sql = "DELETE FROM reviews WHERE user_id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteUseful(Long id) {
+        String sql = "DELETE FROM useful WHERE review_id = ? AND user_id = ?";
+        jdbcTemplate.update(sql, id, id);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -11,19 +12,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.DirectorStorage;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ArrayList;
+import java.util.*;
 
 @Slf4j
 @Component("filmDbStorage")
@@ -147,6 +139,52 @@ public class FilmDbStorageImpl implements FilmStorage {
             log.error("Ошибка обновления фильма id = {}", filmId);
             throw new NotFoundException("Ошибка обновления фильма id = " + filmId);
         }
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        try {
+            deleteFilmGenres(id);
+            deleteFilmLikes(id);
+            deleteFilmReviews(id);
+            deleteFilmUseful(id);
+            deleteFilm(id);
+            log.info("Фильм с id {} был успешно удален", id);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении фильма с id {}: {}", id, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void deleteFilmGenres(Long id) {
+        String sql = "DELETE FROM film_genre WHERE film_id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteFilmLikes(Long id) {
+        String sql = "DELETE FROM film_like WHERE film_id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteFilmReviews(Long id) {
+        String sql = "DELETE FROM reviews WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteFilmUseful(Long id) {
+        String sql = "DELETE FROM useful WHERE review_id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        String sql = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
     @Override

@@ -50,6 +50,10 @@ public class DbUserServiceImpl implements UserService {
         return storage.update(user);
     }
 
+    public void delete(Long id) {
+        storage.delete(id);
+    }
+
     @Override
     public Collection<User> findAll() {
         return storage.findAll();
