@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 
 import java.sql.PreparedStatement;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -194,6 +195,35 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
 
         return jdbcTemplate.query(filmCommonLikes, filmRowMappers::mapRowToFilm, userId,
                 friendId).stream().toList();
+    }
+
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        log.info("Получение рекомендации для пользователя с ID {}", userId);
+
+        String query = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id FROM films f " +
+                "INNER JOIN \n" +
+                "(\n" +
+                "Select film_id from FILM_LIKE f_l\n" +
+                "inner join (\n" +
+                "  Select \n" +
+                "    user_id2.user_id\n" +
+                "  from ( Select film_id from FILM_LIKE where user_id = ?) user_id1\n" +
+                "  left join FILM_LIKE  user_id2\n" +
+                "  on user_id1.film_id = user_id2.film_id and user_id2.user_id <> ?\n" +
+                "  group by user_id2.user_id \n" +
+                "  Order by count(user_id2.film_id) DESC\n" +
+                "  Limit 1\n" +
+                ") curr_user\n" +
+                "on f_l.user_id = curr_user.user_id\n" +
+                "\n" +
+                "EXCEPT\n" +
+                "\n" +
+                "Select film_id from FILM_LIKE where user_id = ?\n" +
+                ") ff\n" +
+                "on f.id = ff.film_id";
+
+        return jdbcTemplate.query(query, filmRowMappers::mapRowToFilm, userId, userId, userId).stream().toList();
     }
 }
 
