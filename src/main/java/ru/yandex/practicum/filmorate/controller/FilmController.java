@@ -25,7 +25,7 @@ public class FilmController {
     public Collection<Film> findAll() {
         log.info("Получен GET запрос /films");
         Collection<Film> result = service.findAll();
-        log.info("Отправлен GET ответ {}", result);
+        log.info("Отправлен GET ответ, size={}, {}", result.size(), result);
         return result;
     }
 
@@ -75,7 +75,7 @@ public class FilmController {
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count, Long genreId, Long year) {
         log.info("Получен GET запрос /films/popular?count={}&genreId={}&year={}", count, genreId, year);
         List<Film> result = service.getPopularFilms(count, genreId, year);
-        log.info("Отправлен GET ответ {}", result);
+        log.info("Отправлен GET ответ, size={}, {}", result.size(), result);
         return result;
     }
 
@@ -83,7 +83,7 @@ public class FilmController {
     public List<Film> getFilmsByDirector(@PathVariable Long id, @RequestParam String sortBy) {
         log.info("Получен GET запрос /films/director/{}", id);
         List<Film> result = service.getFilmsByDirector(id, sortBy);
-        log.info("Отправлен GET ответ {}", result);
+        log.info("Отправлен GET ответ, size={}, {}", result.size(), result);
         return result;
     }
 
