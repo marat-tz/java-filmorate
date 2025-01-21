@@ -58,12 +58,11 @@ public class ReviewDbStorageImpl implements ReviewStorage {
 
     @Override
     public Review updateReview(Review reviews) {
-        final String UPDATE_REVIEW_QUERY = "UPDATE reviews SET content = ?, is_positive = ?, film_id = ? " +
+        final String UPDATE_REVIEW_QUERY = "UPDATE reviews SET content = ?, is_positive = ? " +
                 "WHERE id = ?";
         int update = jdbc.update(UPDATE_REVIEW_QUERY,
                 reviews.getContent(),
                 reviews.getIsPositive(),
-                reviews.getFilmId(),
                 reviews.getReviewId()
         );
         if (update == 0) {
