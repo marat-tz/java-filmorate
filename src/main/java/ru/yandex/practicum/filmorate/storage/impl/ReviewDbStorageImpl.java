@@ -160,12 +160,17 @@ public class ReviewDbStorageImpl implements ReviewStorage {
         if (!likeDislike.isEmpty()) {
             String updateSql = "UPDATE useful SET is_like = ? WHERE review_id = ? AND user_id = ?";
             jdbc.update(updateSql, isLike, reviewId, userId);
-
         } else {
             String insertSql = "INSERT INTO useful (review_id, is_like, user_id) VALUES (?, ?, ?)";
             jdbc.update(insertSql, reviewId, isLike, userId);
         }
         log.info("Добавлен {} у отзыва {} или обновлен для пользователя {}.", isLike ? "лайк" : "дизлайк", reviewId, userId);
+
+        if (isLike){
+            feedStorage.create(userId, EventType.LIKE, Operation.ADD, reviewId);
+        } else {
+            feedStorage.create(userId, EventType.LIKE, Operation.REMOVE, reviewId);
+        }
     }
 
     @Override
