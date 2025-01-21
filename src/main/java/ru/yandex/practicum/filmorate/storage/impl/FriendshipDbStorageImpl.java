@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
@@ -18,7 +17,6 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -32,11 +30,6 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
 
     @Override
     public User addFriend(Long user1Id, Long user2Id) {
-
-        if (Objects.equals(user1Id, user2Id)) {
-            log.error("Нельзя добавить в друзья самого себя");
-            throw new ValidationException("Нельзя добавить в друзья самого себя");
-        }
 
         User mainUser = userStorage.findById(user1Id);
         User friendUser = userStorage.findById(user2Id);
@@ -78,11 +71,7 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
 
     @Override
     public User removeFriend(Long mainUserId, Long friendUserId) {
-        log.info("Удаление из друзей");
-        if (Objects.equals(mainUserId, friendUserId)) {
-            log.error("Нельзя удалить из друзей самого себя");
-            throw new ValidationException("Нельзя удалить из друзей самого себя");
-        }
+        log.info("Начало метода removeFriend");
 
         User mainUser = userStorage.findById(mainUserId);
         User friendUser = userStorage.findById(friendUserId);

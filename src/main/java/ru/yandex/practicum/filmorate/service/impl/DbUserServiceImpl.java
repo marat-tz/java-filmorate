@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -13,7 +15,9 @@ import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
+import java.util.Objects;
 
+@Slf4j
 @Service("dbUserService")
 public class DbUserServiceImpl implements UserService {
 
@@ -70,11 +74,23 @@ public class DbUserServiceImpl implements UserService {
 
     @Override
     public User addFriend(Long mainUserId, Long friendUserId) {
+
+        if (Objects.equals(mainUserId, friendUserId)) {
+            log.error("Нельзя добавить в друзья самого себя");
+            throw new ValidationException("Нельзя добавить в друзья самого себя");
+        }
+
         return friendshipStorage.addFriend(mainUserId, friendUserId);
     }
 
     @Override
     public User removeFriend(Long mainUserId, Long friendUserId) {
+
+        if (Objects.equals(mainUserId, friendUserId)) {
+            log.error("Нельзя удалить из друзей самого себя");
+            throw new ValidationException("Нельзя удалить из друзей самого себя");
+        }
+
         return friendshipStorage.removeFriend(mainUserId, friendUserId);
     }
 
