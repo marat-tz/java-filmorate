@@ -105,7 +105,8 @@ public class FeedDbStorageImpl implements FeedStorage {
         log.info("Получаем события для пользователя с id {}", id);
 
         // запрос на события друзей
-        String sqlQueryFriends = "SELECT fe.id, fe.entity_id, fe.user_id, fe.time_stamp, fe.event_type, fe.operation " +
+        String sqlQueryFriends = "SELECT DISTINCT fe.id, fe.entity_id, fe.user_id, fe.time_stamp, fe.event_type, " +
+                "fe.operation " +
                 "FROM feed fe " +
                 "LEFT JOIN friendship fr ON fr.user2_id = fe.user_id " +
                 "WHERE fr.user1_id = ? OR fe.user_id = ?";

@@ -19,7 +19,7 @@ public class ReviewController {
 
     @PostMapping
     public Review addReview(@Valid @RequestBody Review review) {
-        log.info("Пришел POST запрос с телом {}", review);
+        log.info("Пришел POST запрос /reviews с телом {}", review);
         Review addReview = reviewService.addReview(review);
         log.info("Отправлен POST ответ с телом {}", addReview);
         return addReview;
@@ -27,7 +27,7 @@ public class ReviewController {
 
     @PutMapping
     public Review updateReview(@Valid @RequestBody Review review) {
-        log.info("Пришел PUT запрос с телом {}", review);
+        log.info("Пришел PUT запрос /reviews с телом {}", review);
         Review updateReview = reviewService.updateReview(review);
         log.info("Отправлен PUT ответ с телом {}", updateReview);
         return updateReview;
@@ -35,14 +35,14 @@ public class ReviewController {
 
     @DeleteMapping("/{id}")
     public void deleteReview(@PathVariable Long id) {
-        log.info("Пришел DELETE запрос с телом {}", id);
+        log.info("Пришел DELETE запрос /reviews/{}", id);
         reviewService.deleteReview(id);
     }
 
 
     @GetMapping("/{id}")
     public Review getReviewById(@PathVariable Long id) {
-        log.info("Пришел GET запрос с телом {}", id);
+        log.info("Пришел GET запрос /reviews/{}", id);
         Review review = reviewService.getReviewById(id);
         log.info("Отправлен GET ответ с телом {}", review);
         return review;
@@ -51,7 +51,7 @@ public class ReviewController {
     @GetMapping
     public List<Review> getReviewByFilm(@RequestParam(required = false) Long filmId,
                                         @RequestParam(defaultValue = "10") int count) {
-        log.info("Пришел GET запрос с телом {} {}", filmId, count);
+        log.info("Пришел GET запрос /reviews?film={}&count={}", filmId, count);
         if (filmId != null) {
             List<Review> review = reviewService.getReviewByFilm(filmId, count);
             log.info("Отправлен GET ответ с телом {}", review);
@@ -65,25 +65,25 @@ public class ReviewController {
 
     @PutMapping("/{id}/like/{userId}")
     public void likeToReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел PUT запрос с телом {}, {}", id, userId);
+        log.info("Пришел PUT запрос /reviews/{}/like/{}", id, userId);
         reviewService.likeToReview(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void dislikeToReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел PUT запрос с телом {}, {}", id, userId);
+        log.info("Пришел PUT запрос /reviews/{}/dislike/{}", id, userId);
         reviewService.dislikeToReview(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел DELETE запрос с телом {}, {}", id, userId);
+        log.info("Пришел DELETE запрос /reviews/{}/like/{}", id, userId);
         reviewService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deleteDislike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел DELETE запрос с телом {}, {}", id, userId);
+        log.info("Пришел DELETE запрос /reviews/{}/dislike/{}", id, userId);
         reviewService.deleteDislike(id, userId);
     }
 }

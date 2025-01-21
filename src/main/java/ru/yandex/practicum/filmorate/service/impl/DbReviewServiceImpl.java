@@ -65,7 +65,7 @@ public class DbReviewServiceImpl implements ReviewService {
         try {
             return reviewStorage.getReviewById(id);
         } catch (Exception e) {
-            throw new NotFoundException("Ошибка при получении. " + e.getMessage());
+            throw new NotFoundException("Отзыв с id = " + id + " не найден " + e.getMessage());
         }
     }
 
