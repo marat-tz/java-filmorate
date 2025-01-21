@@ -69,8 +69,11 @@ public class ReviewDbStorageImpl implements ReviewStorage {
             log.info("Не удалось обновить отзыв с id {}.", reviews.getReviewId());
             throw new NotFoundException("Отзыв с таким id не найден.");
         }
-        feedStorage.create(reviews.getUserId(), EventType.REVIEW, Operation.UPDATE, reviews.getReviewId());
-        return getReviewById(reviews.getReviewId());
+
+        Review oldReview = getReviewById(reviews.getReviewId());
+        feedStorage.create(oldReview.getUserId(), EventType.REVIEW, Operation.UPDATE, reviews.getReviewId());
+
+        return oldReview;
     }
 
     @Override

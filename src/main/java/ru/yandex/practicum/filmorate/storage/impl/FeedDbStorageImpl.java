@@ -105,12 +105,11 @@ public class FeedDbStorageImpl implements FeedStorage {
         log.info("Получаем события для пользователя с id {}", id);
 
         // запрос на события друзей
-        String sqlQueryFriends = "SELECT Distinct fe.id, fe.entity_id, fe.user_id, fe.time_stamp, " +
-                "fe.event_type, fe.operation\n" +
-                "FROM feed fe  \n" +
-                "LEFT JOIN friendship fr ON fr.user2_id = fe.user_id  \n" +
-                "WHERE fr.user1_id = ? OR fe.user_id = ? and (fe.operation <> 'UPDATE' or fe.event_type <> 'REVIEW')\n" +
-                "Order by fe.user_id ";
+        String sqlQueryFriends = "SELECT Distinct fe.id, fe.entity_id, fe.user_id, fe.time_stamp, fe.event_type, fe.operation  \n" +
+                "                FROM feed fe  \n" +
+                "                LEFT JOIN friendship fr ON fr.user2_id = fe.user_id  \n" +
+                "                WHERE fr.user1_id = ? OR fe.user_id = ? " +
+                "                Order by fe.user_id, fe.time_stamp ";
 
         List<Feed> result = jdbcTemplate.query(sqlQueryFriends, feedRowMapper::mapRowToFeed, id, id).stream().toList();
 
