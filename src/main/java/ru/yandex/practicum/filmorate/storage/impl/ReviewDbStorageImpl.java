@@ -109,22 +109,22 @@ public class ReviewDbStorageImpl implements ReviewStorage {
 
     @Override
     public List<Review> getReviewByFilm(Long id, int count) {
+
         final String reviewByFilm = "SELECT r.id, r.content, r.is_positive, r.user_id, r.film_id, " +
-                "likes.lik, dislikes.dis\n" +
-                "FROM reviews r\n" +
-                "LEFT JOIN (\n" +
-                "\tSELECT review_id, COUNT(*) AS lik FROM useful WHERE is_like = TRUE GROUP BY review_id\n" +
-                "\t) likes\n" +
-                "\tON likes.review_id = r.id\n" +
-                "LEFT JOIN (\n" +
-                "\tSELECT review_id, COUNT(*) AS dis FROM useful WHERE is_like = FALSE GROUP BY review_id\n" +
-                "\t) dislikes\n" +
-                "\tON dislikes.review_id = r.id\n" +
+                "likes.lik, dislikes.dis " +
+                "FROM reviews r " +
+                "LEFT JOIN (SELECT review_id, COUNT(*) AS lik FROM useful WHERE is_like = TRUE " +
+                "GROUP BY review_id) likes " +
+                "ON likes.review_id = r.id " +
+                "LEFT JOIN (SELECT review_id, COUNT(*) AS dis FROM useful WHERE is_like = FALSE " +
+                "GROUP BY review_id) dislikes " +
+                "ON dislikes.review_id = r.id " +
                 "JOIN films f ON r.film_id = f.id " +
                 "LEFT JOIN useful uf ON r.id = uf.review_id " +
                 "WHERE r.film_id = ? " +
-                "\tOrder by (coalesce(likes.lik, 0) - coalesce(dislikes.dis, 0)) DESC\n" +
-                "\tLIMIT ?";
+                "ORDER BY (COALESCE(likes.lik, 0) - COALESCE(dislikes.dis, 0)) DESC " +
+                "LIMIT ?";
+
         List<Review> review = jdbc.query(reviewByFilm, reviewMapper, id, count);
         log.info("Получены отзывы о фильме {}.", review);
         return review;
@@ -132,18 +132,16 @@ public class ReviewDbStorageImpl implements ReviewStorage {
 
     @Override
     public List<Review> getAllReviews(int count) {
-        final String review = "SELECT r.id, r.content, r.is_positive, r.user_id, r.film_id, likes.lik, dislikes.dis\n" +
-                "FROM reviews r\n" +
-                "LEFT JOIN (\n" +
-                "\tSELECT review_id, COUNT(*) AS lik FROM useful WHERE is_like = TRUE GROUP BY review_id\n" +
-                "\t) likes\n" +
-                "\tON likes.review_id = r.id\n" +
-                "LEFT JOIN (\n" +
-                "\tSELECT review_id, COUNT(*) AS dis FROM useful WHERE is_like = FALSE GROUP BY review_id\n" +
-                "\t) dislikes\n" +
-                "\tON dislikes.review_id = r.id\n" +
-                "\tOrder by (coalesce(likes.lik, 0) - coalesce(dislikes.dis, 0)) DESC\n" +
-                "\tLIMIT ?";
+        final String review = "SELECT r.id, r.content, r.is_positive, r.user_id, r.film_id, likes.lik, dislikes.dis " +
+                "FROM reviews r " +
+                "LEFT JOIN (SELECT review_id, COUNT(*) AS lik FROM useful WHERE is_like = TRUE " +
+                "GROUP BY review_id) likes " +
+                "ON likes.review_id = r.id " +
+                "LEFT JOIN (SELECT review_id, COUNT(*) AS dis FROM useful WHERE is_like = FALSE " +
+                "GROUP BY review_id) dislikes " +
+                "ON dislikes.review_id = r.id " +
+                "ORDER BY (COALESCE(likes.lik, 0) - COALESCE(dislikes.dis, 0)) DESC " +
+                "LIMIT ?";
 
         List<Review> reviews = jdbc.query(review, reviewMapper, count);
         log.info("Получены отзывы о фильме {}.", reviews);
@@ -166,11 +164,6 @@ public class ReviewDbStorageImpl implements ReviewStorage {
         }
         log.info("Добавлен {} у отзыва {} или обновлен для пользователя {}.", isLike ? "лайк" : "дизлайк", reviewId, userId);
 
-        if (isLike){
-            feedStorage.create(userId, EventType.LIKE, Operation.ADD, reviewId);
-        } else {
-            feedStorage.create(userId, EventType.LIKE, Operation.REMOVE, reviewId);
-        }
     }
 
     @Override

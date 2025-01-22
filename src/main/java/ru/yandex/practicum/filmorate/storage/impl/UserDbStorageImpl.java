@@ -60,7 +60,7 @@ public class UserDbStorageImpl implements UserStorage {
     public User create(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         final User finalUser;
-        final Long userId;
+        final long userId;
 
         log.info("Создание нового пользователя: {}", user.getLogin());
 
