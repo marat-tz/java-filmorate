@@ -28,9 +28,7 @@ public class FilmRowMappers {
     private final FilmLikeStorage filmLikeStorage;
 
     public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-
         log.info("Старт метода Film mapRowToFilm(ResultSet resultSet, int rowNum)");
-        
         log.info("Получаем id рейтинга фильма с id = {}", resultSet.getLong("id"));
         Integer mpaId = resultSet.getInt("mpa_id");
 
@@ -47,7 +45,7 @@ public class FilmRowMappers {
         List<Director> directors = directorStorage.getDirectorsByFilm(resultSet.getLong("id"));
 
         log.info("Получаем дату выхода фильма с id = {}", resultSet.getLong("id"));
-        LocalDate date = LocalDate.of(1895, 12,28);
+        LocalDate date = LocalDate.of(1895, 12, 28);
         if (resultSet.getString("releaseDate") != null) {
             date = LocalDate.parse(resultSet.getString("releaseDate"));
         }
