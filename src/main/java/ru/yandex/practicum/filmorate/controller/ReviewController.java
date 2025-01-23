@@ -2,8 +2,15 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
@@ -11,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
-@Slf4j
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -19,71 +25,52 @@ public class ReviewController {
 
     @PostMapping
     public Review addReview(@Valid @RequestBody Review review) {
-        log.info("Пришел POST запрос /reviews с телом {}", review);
-        Review addReview = reviewService.addReview(review);
-        log.info("Отправлен POST ответ с телом {}", addReview);
-        return addReview;
+        return reviewService.addReview(review);
     }
 
     @PutMapping
     public Review updateReview(@Valid @RequestBody Review review) {
-        log.info("Пришел PUT запрос /reviews с телом {}", review);
-        Review updateReview = reviewService.updateReview(review);
-        log.info("Отправлен PUT ответ с телом {}", updateReview);
-        return updateReview;
+        return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/{id}")
     public void deleteReview(@PathVariable Long id) {
-        log.info("Пришел DELETE запрос /reviews/{}", id);
         reviewService.deleteReview(id);
     }
 
 
     @GetMapping("/{id}")
     public Review getReviewById(@PathVariable Long id) {
-        log.info("Пришел GET запрос /reviews/{}", id);
-        Review review = reviewService.getReviewById(id);
-        log.info("Отправлен GET ответ с телом {}", review);
-        return review;
+        return reviewService.getReviewById(id);
     }
 
     @GetMapping
     public List<Review> getReviewByFilm(@RequestParam(required = false) Long filmId,
                                         @RequestParam(defaultValue = "10") int count) {
-        log.info("Пришел GET запрос /reviews?film={}&count={}", filmId, count);
         if (filmId != null) {
-            List<Review> review = reviewService.getReviewByFilm(filmId, count);
-            log.info("Отправлен GET ответ с телом {}", review);
-            return review;
+            return reviewService.getReviewByFilm(filmId, count);
         } else {
-            List<Review> reviews = reviewService.getAllReviews(count);
-            log.info("Отправлен GET ответ с телом {}", reviews);
-            return reviews;
+            return reviewService.getAllReviews(count);
         }
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void likeToReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел PUT запрос /reviews/{}/like/{}", id, userId);
         reviewService.likeToReview(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void dislikeToReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел PUT запрос /reviews/{}/dislike/{}", id, userId);
         reviewService.dislikeToReview(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел DELETE запрос /reviews/{}/like/{}", id, userId);
         reviewService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deleteDislike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Пришел DELETE запрос /reviews/{}/dislike/{}", id, userId);
         reviewService.deleteDislike(id, userId);
     }
 }
