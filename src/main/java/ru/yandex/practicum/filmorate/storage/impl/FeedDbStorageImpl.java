@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,7 +29,7 @@ public class FeedDbStorageImpl implements FeedStorage {
     private final FeedRowMapper feedRowMapper;
 
     @Override
-    public Collection<Feed> findAll() {
+    public List<Feed> findAll() {
         log.info("Выгрузка всех событий");
         final String sqlQuery = "SELECT id, entity_id, user_id, time_stamp, event_type, operation FROM feed";
         return jdbcTemplate.query(sqlQuery, feedRowMapper::mapRowToFeed);
@@ -101,7 +100,7 @@ public class FeedDbStorageImpl implements FeedStorage {
     }
 
     @Override
-    public Collection<Feed> getUserFeed(Long id) {
+    public List<Feed> getUserFeed(Long id) {
         log.info("Получаем события для пользователя с id {}", id);
 
         // запрос на события друзей

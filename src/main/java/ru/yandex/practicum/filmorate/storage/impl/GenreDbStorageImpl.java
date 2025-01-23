@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,12 +26,12 @@ public class GenreDbStorageImpl implements GenreStorage {
     private final GenreRowMappers genreRowMappers;
 
     @Override
-    public Collection<Genre> findAll() {
+    public List<Genre> findAll() {
         String sqlQuery = "SELECT * from genres";
         return jdbcTemplate.query(sqlQuery, genreRowMappers::mapRowToGenre);
     }
 
-    public Collection<Long> findIds() {
+    public List<Long> findIds() {
         String sqlQuery = "SELECT id from genres";
         return jdbcTemplate.queryForList(sqlQuery, Long.class);
     }
@@ -67,7 +66,7 @@ public class GenreDbStorageImpl implements GenreStorage {
     }
 
     @Override
-    public Collection<Genre> getExistGenres(Film film) {
+    public List<Genre> getExistGenres(Film film) {
         List<Long> genres = findIds().stream().toList();
         List<Genre> filmGenres = film.getGenres();
         List<Genre> resultGenres = new ArrayList<>();

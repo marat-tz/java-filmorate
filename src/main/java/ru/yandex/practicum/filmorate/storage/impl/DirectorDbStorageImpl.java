@@ -16,7 +16,6 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +28,7 @@ public class DirectorDbStorageImpl implements DirectorStorage {
     private final DirectorRowMappers directorRowMappers;
 
     @Override
-    public Collection<Director> findAll() {
+    public List<Director> findAll() {
         String sqlQuery = "SELECT id, name FROM directors";
         return jdbcTemplate.query(sqlQuery, directorRowMappers::mapRowToDirector);
     }

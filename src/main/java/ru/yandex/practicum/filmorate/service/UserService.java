@@ -4,13 +4,13 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface UserService {
 
-    Collection<User> getFriends(Long userId);
+    List<User> getFriends(Long userId);
 
-    Collection<User> getCommonFriends(Long firstUserId, Long secondUserId);
+    List<User> getCommonFriends(Long firstUserId, Long secondUserId);
 
     User create(User user);
 
@@ -18,7 +18,7 @@ public interface UserService {
 
     void delete(Long id);
 
-    Collection<User> findAll();
+    List<User> findAll();
 
     User findById(Long id);
 
@@ -26,7 +26,7 @@ public interface UserService {
 
     User removeFriend(Long mainUserId, Long friendUserId);
 
-    Collection<Feed> getUserFeed(Long id);
+    List<Feed> getUserFeed(Long id);
 
-    Collection<Film> getRecommendations(Long id);
+    List<Film> getRecommendations(Long id);
 }

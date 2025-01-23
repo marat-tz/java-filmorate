@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -27,13 +26,13 @@ public class FilmGenreDbStorageImpl implements FilmGenreStorage {
     private final GenreRowMappers genreRowMappers;
 
     @Override
-    public Collection<Genre> findAll() {
+    public List<Genre> findAll() {
         final String sqlQuery = "SELECT * FROM film_genre";
         return jdbcTemplate.query(sqlQuery, genreRowMappers::mapRowToGenre);
     }
 
     @Override
-    public Collection<Genre> findByFilmId(Long id) {
+    public List<Genre> findByFilmId(Long id) {
         final String sqlQuery = "SELECT genre_id FROM film_genre WHERE film_id = ? ";
         return jdbcTemplate.query(sqlQuery, genreRowMappers::mapRowToGenre, id);
     }

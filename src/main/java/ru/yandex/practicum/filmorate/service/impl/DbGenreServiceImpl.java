@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +19,7 @@ public class DbGenreServiceImpl implements GenreService {
     }
 
     @Override
-    public Collection<Genre> findAll() {
+    public List<Genre> findAll() {
         return genreStorage.findAll();
     }
 

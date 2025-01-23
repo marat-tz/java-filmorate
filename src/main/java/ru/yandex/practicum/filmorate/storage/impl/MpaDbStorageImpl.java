@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public class MpaDbStorageImpl implements MpaStorage {
     private final MpaRowMappers mpaRowMappers;
 
     @Override
-    public Collection<Mpa> findAll() {
+    public List<Mpa> findAll() {
         String sqlQuery = "SELECT * from mpa";
         return jdbcTemplate.query(sqlQuery, mpaRowMappers::mapRowToMpa);
     }

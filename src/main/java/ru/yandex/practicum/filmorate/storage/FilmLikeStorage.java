@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
-import java.util.Collection;
 
 public interface FilmLikeStorage {
 
@@ -17,5 +16,5 @@ public interface FilmLikeStorage {
 
     List<Film> getCommonFilms(Long userId, Long friendUserId);
 
-    Collection<Film> getRecommendations(Long userId);
+    List<Film> getRecommendations(Long userId);
 }

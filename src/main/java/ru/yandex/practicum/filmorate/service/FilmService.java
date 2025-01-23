@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface FilmService {
@@ -13,7 +12,7 @@ public interface FilmService {
 
     void delete(Long id);
 
-    Collection<Film> findAll();
+    List<Film> findAll();
 
     Film findById(Long id);
 

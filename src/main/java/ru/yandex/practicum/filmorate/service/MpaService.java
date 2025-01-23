@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface MpaService {
 
-    Collection<Mpa> findAll();
+    List<Mpa> findAll();
 
     Mpa findById(Integer id);
 

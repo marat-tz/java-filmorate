@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.impl.DbDirectorServiceImpl;
 
-import java.util.Collection;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/directors")
@@ -25,7 +26,7 @@ public class DirectorController {
 
     //GET /directors - Список всех режиссёров
     @GetMapping
-    public Collection<Director> findAll() {
+    public List<Director> findAll() {
         return service.findAll();
     }
 

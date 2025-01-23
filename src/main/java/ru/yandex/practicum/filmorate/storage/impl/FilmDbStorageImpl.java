@@ -20,7 +20,6 @@ import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,7 +37,7 @@ public class FilmDbStorageImpl implements FilmStorage {
     private final DirectorStorage directorStorage;
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         log.info("Выгрузка всех фильмов");
         final String sqlQuery = "SELECT id, name, description, releaseDate, duration, mpa_id FROM films";
         return jdbcTemplate.query(sqlQuery, filmRowMappers::mapRowToFilm);

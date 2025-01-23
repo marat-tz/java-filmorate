@@ -15,7 +15,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class UserDbStorageImpl implements UserStorage {
     private final UserRowMapper userRowMapper;
 
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         String sqlQuery = "SELECT id, email, login, name, birthday from users";
         return jdbcTemplate.query(sqlQuery, userRowMapper::mapRowToUser);
     }

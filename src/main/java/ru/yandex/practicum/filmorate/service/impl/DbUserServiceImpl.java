@@ -14,7 +14,7 @@ import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -35,7 +35,7 @@ public class DbUserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<User> getFriends(Long userId) {
+    public List<User> getFriends(Long userId) {
         if (findById(userId) == null) {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
@@ -44,7 +44,7 @@ public class DbUserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<User> getCommonFriends(Long firstUserId, Long secondUserId) {
+    public List<User> getCommonFriends(Long firstUserId, Long secondUserId) {
         return friendshipStorage.getCommonFriends(firstUserId, secondUserId);
     }
 
@@ -63,7 +63,7 @@ public class DbUserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         return storage.findAll();
     }
 
@@ -95,13 +95,13 @@ public class DbUserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<Feed> getUserFeed(Long id) {
+    public List<Feed> getUserFeed(Long id) {
         findById(id);
         return feedStorage.getUserFeed(id);
     }
 
     @Override
-    public Collection<Film> getRecommendations(Long id) {
+    public List<Film> getRecommendations(Long id) {
         return filmLikeStorage.getRecommendations(id);
     }
 

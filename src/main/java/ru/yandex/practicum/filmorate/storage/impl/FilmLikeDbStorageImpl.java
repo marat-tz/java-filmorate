@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -185,7 +184,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeStorage {
     }
 
     @Override
-    public Collection<Film> getRecommendations(Long userId) {
+    public List<Film> getRecommendations(Long userId) {
         log.info("Получение рекомендации для пользователя с ID {}", userId);
 
         String query = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpa_id FROM films f " +

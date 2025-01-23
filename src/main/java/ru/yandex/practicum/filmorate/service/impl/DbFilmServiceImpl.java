@@ -48,7 +48,7 @@ public class DbFilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return filmStorage.findAll();
     }
 

@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
-import java.util.Collection;
+import java.util.List;
 
 @Service
 public class DbDirectorServiceImpl implements DirectorService {
@@ -16,7 +16,7 @@ public class DbDirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public Collection<Director> findAll() {
+    public List<Director> findAll() {
         return storage.findAll();
     }
 

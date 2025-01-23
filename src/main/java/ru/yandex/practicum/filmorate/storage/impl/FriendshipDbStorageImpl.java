@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -99,7 +98,7 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
     }
 
     @Override
-    public Collection<User> getCommonFriends(Long firstUserId, Long secondUserId) {
+    public List<User> getCommonFriends(Long firstUserId, Long secondUserId) {
         String sqlCommonFriends = "SELECT id, email, login, name, birthday FROM users " +
                 "JOIN friendship AS fri ON users.id = fri.user2_id " +
                 "JOIN friendship AS fri2 ON users.id = fri2.user2_id " +
@@ -120,7 +119,7 @@ public class FriendshipDbStorageImpl implements FriendshipStorage {
     }
 
     @Override
-    public Collection<User> getFriends(Long userId) {
+    public List<User> getFriends(Long userId) {
         String sqlQueryUser2 = "SELECT user2_id " +
                 "FROM friendship WHERE user1_id = ?";
 
