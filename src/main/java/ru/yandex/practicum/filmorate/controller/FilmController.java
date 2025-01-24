@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -28,7 +27,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return service.findAll();
     }
 
@@ -47,6 +46,11 @@ public class FilmController {
         return service.update(newFilm);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@PathVariable Long id) {
+        service.delete(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         service.addLike(id, userId);
@@ -58,7 +62,22 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count) {
-        return service.getPopularFilms(count);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count, Long genreId, Long year) {
+        return service.getPopularFilms(count, genreId, year);
+    }
+
+    @GetMapping("director/{id}")
+    public List<Film> getFilmsByDirector(@PathVariable Long id, @RequestParam String sortBy) {
+        return service.getFilmsByDirector(id, sortBy);
+    }
+
+    @GetMapping("/search")
+    public List<Film> getFilmsByDirectorAndOrByTitle(@RequestParam String query, @RequestParam String by) {
+        return service.getFilmsByDirectorAndOrByTitle(query, by);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return service.getCommonFilms(userId, friendId);
     }
 }

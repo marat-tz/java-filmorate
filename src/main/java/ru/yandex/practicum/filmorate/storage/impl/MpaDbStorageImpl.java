@@ -1,35 +1,34 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mappers.MpaRowMappers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @Component("mpaDbStorage")
+
+@RequiredArgsConstructor
 public class MpaDbStorageImpl implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public MpaDbStorageImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final MpaRowMappers mpaRowMappers;
 
     @Override
-    public Collection<Mpa> findAll() {
+    public List<Mpa> findAll() {
         String sqlQuery = "SELECT * from mpa";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToMpa);
+        return jdbcTemplate.query(sqlQuery, mpaRowMappers::mapRowToMpa);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class MpaDbStorageImpl implements MpaStorage {
 
         try {
             resultMpa = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
-                    this::mapRowToMpa, id));
+                    mpaRowMappers::mapRowToMpa, id));
         } catch (EmptyResultDataAccessException e) {
             resultMpa = Optional.empty();
         }
@@ -50,7 +49,8 @@ public class MpaDbStorageImpl implements MpaStorage {
 
     @Override
     public Integer getCountById(Film film) {
-        log.info("Проверка существования mpa_id = {} в таблице mpa", film.getMpa().getId());
+        log.info("Проверка существования mpa_id в таблице mpa");
+
         Integer count;
         final String sqlQueryMpa = "SELECT COUNT(*) " +
                 "FROM mpa WHERE id = ?";
@@ -78,7 +78,7 @@ public class MpaDbStorageImpl implements MpaStorage {
 
         try {
             resultMpa = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery,
-                    this::mapRowToMpa, id));
+                    mpaRowMappers::mapRowToMpa, id));
         } catch (EmptyResultDataAccessException e) {
             resultMpa = Optional.empty();
         }
@@ -90,13 +90,6 @@ public class MpaDbStorageImpl implements MpaStorage {
             log.error("Mpa с id = {} не найден", id);
             throw new NotFoundException("Mpa с id = " + id + " не найден");
         }
-    }
-
-    public Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        return Mpa.builder()
-                .id(resultSet.getLong("id"))
-                .name(resultSet.getString("name"))
-                .build();
     }
 
 }

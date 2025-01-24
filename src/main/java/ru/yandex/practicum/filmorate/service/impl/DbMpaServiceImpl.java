@@ -1,15 +1,13 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
-import java.util.Collection;
+import java.util.List;
 
-@Slf4j
 @Service
 public class DbMpaServiceImpl implements MpaService {
 
@@ -20,7 +18,7 @@ public class DbMpaServiceImpl implements MpaService {
     }
 
     @Override
-    public Collection<Mpa> findAll() {
+    public List<Mpa> findAll() {
         return storage.findAll();
     }
 

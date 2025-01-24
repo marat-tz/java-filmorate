@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,7 +15,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,13 +29,13 @@ public class UserDbStorageImpl implements UserStorage {
     private final UserRowMapper userRowMapper;
 
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         String sqlQuery = "SELECT id, email, login, name, birthday from users";
         return jdbcTemplate.query(sqlQuery, userRowMapper::mapRowToUser);
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public User findById(Long id) {
         Optional<User> resultUser;
 
         String sqlQuery = "SELECT id, email, login, name, birthday " +
@@ -49,7 +49,7 @@ public class UserDbStorageImpl implements UserStorage {
         }
 
         if (resultUser.isPresent()) {
-            return resultUser;
+            return resultUser.get();
 
         } else {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
@@ -60,14 +60,14 @@ public class UserDbStorageImpl implements UserStorage {
     public User create(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         final User finalUser;
-        final Long userId;
+        final long userId;
 
         log.info("Создание нового пользователя: {}", user.getLogin());
 
         String sqlQuery = "INSERT INTO users(email, login, name, birthday) " +
                 "values (?, ?, ?, ?)";
 
-        if (Objects.isNull(user.getName())) {
+        if (user.getName().isBlank()) {
             finalUser = mapper.toUserIfNoName(user);
         } else {
             finalUser = mapper.toUser(user);
@@ -105,12 +105,9 @@ public class UserDbStorageImpl implements UserStorage {
 
         log.info("Обновление данных пользователя с id = {}", newUser.getId());
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-
         String sqlQuery = "UPDATE users SET " +
-                    "email = ?, login = ?, name = ?, birthday = ? " +
-                    "where id = ?";
+                "email = ?, login = ?, name = ?, birthday = ? " +
+                "where id = ?";
 
         int rows = jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
@@ -143,6 +140,19 @@ public class UserDbStorageImpl implements UserStorage {
         } else {
             log.error("Пользователь с id = {} не найден", userId);
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        try {
+            String sql = "DELETE FROM users WHERE id = ?";
+            jdbcTemplate.update(sql, id);
+            log.info("Пользователь с id = {} был успешно удален.", id);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении пользователя с id = {}: {}", id, e.getMessage());
+            throw e;
         }
     }
 }
