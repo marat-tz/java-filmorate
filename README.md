@@ -1,4 +1,4 @@
-# java-filmorate
+# cinema-rating
 Template repository for Filmorate project.
 
 В рамках группового проекта:
